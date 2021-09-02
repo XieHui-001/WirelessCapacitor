@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--默认情况下是一个带圆角,蓝色背景,白色边框的矩形-->
+    <item android:state_window_focused="false">
+        <shape android:shape="rectangle">
+            <!--圆角-->
+            <corners android:radius="5dp" />
+            <!--渐变色-->
+            <gradient android:angle="0"
+                android:endColor="@color/pink"
+                android:startColor="@color/pink2"
+                android:type="linear" />
+
+        </shape>
+
+    </item>
+
+    <!--单击时是一个带圆角,绿色背景,白色边框的矩形-->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <!--圆角-->
+            <corners android:radius="5dp" />
+            <gradient
+                android:centerX="0.5"
+                android:centerY="0.5"
+                android:endColor="#da97f6"
+                android:gradientRadius="90"
+                android:startColor="#e35fff"
+                android:type="radial" />
+        </shape>
+    </item>
+
+</selector>

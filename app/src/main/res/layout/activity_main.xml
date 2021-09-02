@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/ic_background"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_10"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="无线电容读表"
+            android:textColor="@color/color_white"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/main_date"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="right|center"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/ic_date" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginRight="5dp"
+        android:orientation="horizontal">
+
+        <!--电容-->
+        <LinearLayout
+            android:id="@+id/main_capacitance"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_green"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_capacitance" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="电容"
+                    android:textColor="@color/color_white"
+                    android:textSize="14sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="23F"
+                    android:textColor="@color/color_white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--电流-->
+        <LinearLayout
+            android:id="@+id/main_current"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_orange"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_current" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="电流"
+                    android:textColor="@color/color_white"
+                    android:textSize="14sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="23A"
+                    android:textColor="@color/color_white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--电压-->
+        <LinearLayout
+            android:id="@+id/main_voltage"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_pink"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_voltage" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="电压"
+                    android:textColor="@color/color_white"
+                    android:textSize="14sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="23V"
+                    android:textColor="@color/color_white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!--电阻-->
+        <LinearLayout
+            android:id="@+id/main_resistance"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_blue"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_resistance" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="电阻"
+                    android:textColor="@color/color_white"
+                    android:textSize="16sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="23Ω"
+                    android:textColor="@color/color_white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="@dimen/dp_40"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/bg_white"
+        android:orientation="horizontal"
+        android:padding="15dp">
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="设备名"
+            android:textColor="@color/color_666666"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="数据"
+            android:textColor="@color/color_666666"
+            android:textSize="14sp" />
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="温度"
+            android:textColor="@color/color_666666"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="时间"
+            android:textColor="@color/color_666666"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--数据列表-->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/historical_pictures_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_marginRight="@dimen/dp_10" />
+
+    </ScrollView>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/read_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/dp_10"
+        android:background="@drawable/login_bt_red"
+        android:stateListAnimator="@null"
+        android:text="读取"
+        android:textColor="@color/color_white" />
+
+
+</LinearLayout>

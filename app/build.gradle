@@ -1,0 +1,80 @@
+apply plugin: 'com.android.application'
+
+android {
+
+    signingConfigs {
+        release {
+            keyAlias 'wirelesscapacitor'//别名名字
+            keyPassword 'wirelesscapacitor'//别名密码
+            storePassword 'wirelesscapacitor'//签名密码
+            storeFile file('../app/wirelesscapacitor.jks')//签名文件地址
+        }
+        debug {
+            storePassword 'wirelesscapacitor'
+            keyAlias 'wirelesscapacitor'
+            keyPassword 'wirelesscapacitor'
+            storeFile file('../app/wirelesscapacitor.jks')//签名文件地址
+        }
+    }
+
+
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+
+    defaultConfig {
+        applicationId "com.example.wirelesscapacitor"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.navigation:navigation-fragment:2.1.0'
+    implementation 'androidx.navigation:navigation-ui:2.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+
+
+    //butterknife
+    implementation 'com.jakewharton:butterknife:10.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+    //时间选择器
+    implementation 'com.contrarywind:Android-PickerView:4.1.9'
+
+    //usb
+    implementation 'com.android.support:support-v4:18.0.0'
+    implementation files('libs/pl2303driver.jar')
+
+    implementation 'org.greenrobot:eventbus:3.1.1'
+}

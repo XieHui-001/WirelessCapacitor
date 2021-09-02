@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+
+
+    <color name="darkDlue">#618dff</color>
+
+    <color name="colorPrimary1">#435de9</color>
+
+    <color name="colorPrimary2">#2559fb</color>
+
+    <color name="colorPrimaryDark">#303F9F</color>
+
+    <color name="dark_blue">#06125A</color>
+
+    <color name="colorAccent">#FF4081</color>
+    <color name="black_overlay">#55000000</color>
+    <color name="trans">#11000000</color>
+    <color name="color_bg">#DDDDDD</color>
+    <color name="color_bg_gray">#ececec</color>
+    <color name="color_f7f7f7">#f7f7f7</color>
+    <color name="color_cccccc">#cccccc</color>
+
+    <color name="color_light_blue">#618aff</color>
+    <color name="color_light_blue2">#5fe7ff</color>
+
+    <color name="color_main">#1296db</color>
+    <color name="bg_mi_color">#B7E2FC</color>
+    <color name="bg_mi_tv_color">#4FB9FA</color>
+    <color name="color_white">#FFFFFF</color>
+    <color name="color_red">#FF0000</color>
+    <color name="color_red2">#f93d3d</color>
+    <color name="color_red3">#fc2a2a</color>
+
+
+    <color name="orange">#ff8a5f</color>
+    <color name="orange2">#f59d46</color>
+    <color name="pink">#e35fff</color>
+    <color name="pink2">#da97f6</color>
+    <color name="blue">#2d80f2</color>
+    <color name="blue2">#7cb9fd</color>
+
+
+    <color name="color_red_alpha">#66ff3921</color>
+    <color name="color_gray">#2c2c2c</color>
+    <color name="color_black">#333333</color>
+    <color name="color_black_gray">#323232</color>
+    <color name="color_gray_line">#F8F8FF</color>
+    <color name="color_refresh_gray">#bfbfbf</color>
+    <color name="color_default_bg">#F5F5F5</color>
+
+    <color name="activity_login_line">#989898</color>
+    <color name="activity_login_text1">#079ECB</color>
+    <color name="activity_login_text2">#E9E9E9</color>
+    <color name="activity_register_gray">#C0C0C0</color>
+    <color name="refresh_gray">#bfbfbf</color>
+    <color name="activity_live_gray">#8a8a8a</color>
+    <color name="black_two">#3C3C3C</color>
+
+    <color name="color_bg_name">#c7c2c2</color>
+    <color name="color_999999">#999999</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_333333">#333333</color>
+    <color name="color_ececec">#ececec</color>
+    <color name="color_e6e6e6">#e6e6e6</color>
+
+
+    <color name="bar">#6CB0DF</color>
+    <color name="bar1">#B5C2CA</color>
+    <color name="bar2">#F5E6BF</color>
+    <color name="bar3">#81D8C8</color>
+
+    <color name="description">#686868</color>
+
+    <color name="green">#0cac57</color>
+    <color name="line">#8CD276</color>
+    <color name="line5">#0cac57</color>
+    <color name="linefill">#DEEFE4</color>
+    <color name="line1">#E9C517</color>
+    <color name="line1fill">#ECEAD0</color>
+    <color name="line2">#9F8FBA</color>
+    <color name="line2fill">#EBE4F8</color>
+    <!-- 回放，TimeBar底部可播放时间区域显示颜色 -->
+    <color name="playback_timebar_color">#2e78c2</color>
+
+
+    <drawable name="translucent">#00000000</drawable>
+</resources>
