@@ -21,12 +21,13 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
     defaultConfig {
         applicationId "com.example.wirelesscapacitor"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -77,4 +78,9 @@ dependencies {
     implementation files('libs/pl2303driver.jar')
 
     implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    implementation "com.squareup.okhttp3:logging-interceptor:3.8.1"
+    implementation 'com.alibaba:fastjson:1.1.54.android'
+    compile 'cz.msebera.android:httpclient:4.3.6'
+    implementation 'com.wang.avi:library:2.1.3'
 }

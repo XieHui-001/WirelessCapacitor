@@ -7,7 +7,11 @@ public class MainBean implements Serializable {
     private String tiem;//时间
     private String capacitance;//电容
     private String temperature;//温度
+    public static  MainBean Instance = null;
 
+    public  MainBean(){
+        MainBean.Instance = this;
+    }
 
     public String getId() {
         return id;

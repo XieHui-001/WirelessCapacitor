@@ -1,5 +1,7 @@
 package com.example.wirelesscapacitor;
 
+import android.os.ParcelUuid;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.nio.ByteBuffer;
@@ -21,7 +23,6 @@ public class Decoder {
         }
         return ostr;
     }
-
     public static byte[] hexStr2Byte(String hex) {
         ByteBuffer bf = ByteBuffer.allocate(hex.length() / 2);
         for (int i = 0; i < hex.length(); i++) {
@@ -34,7 +35,7 @@ public class Decoder {
         return bf.array();
     }
 
-
+    public static String Uints = null;
     public void Test() {
         String hex = "AAAF3900570010574241393933202B30303030203129040080000D0A54656D70203D2033332E31313020202048756D69203D2035332E3732300D0A87";
         byte[] rbuf = hexStr2Byte(hex);
@@ -94,6 +95,7 @@ public class Decoder {
         {
             byte[] dBuf = Arrays.copyOfRange(rbuf, dFirstIndx, dLastIndx);
             serData.DianROng = this.DianRongData(dBuf);//电容
+            MyErrorLog.e("电容数据",serData.DianROng);
         }
 
 
@@ -132,6 +134,7 @@ public class Decoder {
         String dataType = this.DataByte(dat);
         this.Space(dat[5]);
         dataType = this.Point(dataType, dat[6]);
+        MyErrorLog.e("数据状态",dataType);
         rstr += dataType;
 
         String sb1 = this.SB1(dat[7]);
@@ -143,7 +146,7 @@ public class Decoder {
         String sb3 = this.SB3(dat[9]);
         rstr += sb3;
 
-        String sb4 =this.SB4(dat[10]);
+        String sb4 = this.SB4(dat[10]);
         rstr += sb4;
 
         this.BAR(dat[11]);
@@ -174,8 +177,8 @@ public class Decoder {
     }
 
     private String Point(String val, byte dat) {
-
         StringBuffer s1 = new StringBuffer(val);
+        MyErrorLog.e("原始Value",val+"原始 dat:"+dat);
         int point = dat;
         switch (point) {
             case 0x30:
@@ -188,9 +191,8 @@ public class Decoder {
                 break;
             case 0x33:
                 s1.insert(3, ".");
-                break;
             default:
-                return "ERR";
+                return s1.insert(3, ".").toString();
 //            case 0x34:
 //                return "ERR";
 ////                int idx = -1;
@@ -233,17 +235,21 @@ public class Decoder {
         int AUTO = (dat >> 5) & 0x01;
 
         if (AC == 1) {
+            // 交流
             rstr += "AC - ";
+            Uints = "AC";
         }
 
         if (DC == 1) {
+            // 直流
             rstr += "DC - ";
+            Uints = "DC";
         }
 
         if (AUTO == 1) {
+            // 自动
             rstr += "AUTO - ";
         }
-
         return rstr;
     }
 
@@ -324,20 +330,28 @@ public class Decoder {
         int V = (dat >> 7) & 0x01;
 
         if (F == 1) {
+            // 电容单位
             rstr += "F - ";
         } else if (C == 1) {
+            // 电容类型
             rstr += "C - ";
         } else if (f == 1) {
+            // 直流电容单位
             rstr += "f - ";
         } else if (Hz == 1) {
+            // 电流频率
             rstr += "Hz - ";
         } else if (hFE == 1) {
+            // 三极管直流电流
             rstr += "hFE - ";
         } else if (Q == 1) {
-            rstr += "Q - ";
+            //
+            rstr += "Ω - ";
         } else if (A == 1) {
+            // 电流
             rstr += "A - ";
         } else if (V == 1) {
+            // 电压
             rstr += "V - ";
         }
         return rstr;

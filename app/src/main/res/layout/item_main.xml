@@ -1,56 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/color_white"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:padding="15dp"
+    >
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/LinerLayout1"
+        android:orientation="vertical">
+
+<!--        <TextView-->
+<!--            android:id="@+id/name"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center"-->
+<!--            android:text="测试"-->
+<!--            android:textColor="@color/color_666666"-->
+<!--            android:textSize="@dimen/sp_14" />-->
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/data"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center"-->
+<!--            android:text="16"-->
+<!--            android:textColor="@color/color_666666"-->
+<!--            android:textSize="@dimen/sp_14" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/unit"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center"-->
+<!--            android:text=""-->
+<!--            android:textColor="@color/color_666666"-->
+<!--            android:textSize="@dimen/sp_14" />-->
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/time"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center"-->
+<!--            android:text="16:24:30"-->
+<!--            android:textColor="@color/color_666666"-->
+<!--            android:textSize="@dimen/sp_14" />-->
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LinerLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/LinerLayout1">
 
         <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:id="@+id/test1"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="测试"
-            android:textColor="@color/color_666666"
-            android:textSize="@dimen/sp_14" />
+            android:gravity="center" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/dataType"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/dataValue"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/dataUint"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+<!--        <View-->
+<!--            android:layout_width="0.5dp"-->
+<!--            android:layout_height="70dp"-->
+<!--            android:background="#e1ebf5" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/test2"-->
+<!--            android:layout_width="103dp"-->
+<!--            android:layout_height="70dp"-->
+<!--            android:layout_below="@+id/LinerLayout1"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="center" />-->
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
 
 
         <TextView
-            android:id="@+id/data"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:id="@+id/test3"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="16"
-            android:textColor="@color/color_666666"
-            android:textSize="@dimen/sp_14" />
-
+            android:gravity="center" />
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
         <TextView
-            android:id="@+id/unit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:id="@+id/test4"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text=""
-            android:textColor="@color/color_666666"
-            android:textSize="@dimen/sp_14" />
-
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="16:24:30"
-            android:textColor="@color/color_666666"
-            android:textSize="@dimen/sp_14" />
+            android:gravity="center" />
 
     </LinearLayout>
 
@@ -58,4 +156,5 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="#e1ebf5" />
-</LinearLayout>
+
+</RelativeLayout>

@@ -5,12 +5,27 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22083333333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/bg_white.xml" value="0.22083333333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/ic_launcher_background.xml" value="0.22083333333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_main2.xml" value="0.2046875" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/fragment_first.xml" value="0.2046875" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/fragment_second.xml" value="0.2046875" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/item_main.xml" value="0.25" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.23854166666666668" />
+      </map>
+    </option>
+  </component>
   <component name="EntryPointsManager">
     <list size="1">
       <item index="0" class="java.lang.String" itemvalue="org.greenrobot.eventbus.Subscribe" />
     </list>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="16.0.2" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
