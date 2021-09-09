@@ -255,7 +255,6 @@ public class Decoder {
 
     private String SB2(byte dat) {
         String rstr = "";
-
         int Z3 = dat & 0x01;
         int n = (dat >> 1) & 0x01;
         int Bat = (dat >> 2) & 0x01;
