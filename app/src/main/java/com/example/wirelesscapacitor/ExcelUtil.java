@@ -173,65 +173,6 @@ public class ExcelUtil {
             }
 
         }
-//        if (objList != null && objList.size() > 0) {
-//            WritableWorkbook writebook = null;
-//            InputStream in = null;
-//            try {
-//                WorkbookSettings setEncode = new WorkbookSettings();
-//                setEncode.setEncoding(UTF8_ENCODING);
-//                // 文件 名称
-//                File file = new File("/sdcard/TalkDooClassExe/log/Export");
-//                makeDir(file);
-//                File saveFile = new File(file, fileName);
-//                if (!saveFile.exists()) {
-//                    saveFile.createNewFile();
-//                }
-//
-//                in = new FileInputStream(saveFile);
-//                Workbook workbook = Workbook.getWorkbook(in);
-//                writebook = Workbook.createWorkbook(saveFile, workbook);
-//                WritableSheet sheet = writebook.getSheet(0);
-//
-//
-//                for (int j = 0; j < objList.size(); j++) {
-//                    ArrayList<String> list = (ArrayList<String>) objList.get(j);
-//                    for (int i = 0; i < list.size(); i++) {
-//                        sheet.addCell(new Label(i, j + 1, list.get(i), arial12format));
-//                        if (list.get(i).length() <= 5) {
-//                            //设置列宽
-//                            sheet.setColumnView(i, list.get(i).length() + 8);
-//                        } else {
-//                            //设置列宽
-//                            sheet.setColumnView(i, list.get(i).length() + 5);
-//                        }
-//                    }
-//                    //设置行高
-//                    sheet.setRowView(j + 1, 350);
-//                }
-//
-//                writebook.write();
-//                Toast.makeText(c, "导出Excel成功", Toast.LENGTH_SHORT).show();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//                if (writebook != null) {
-//                    try {
-//                        writebook.close();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//                if (in != null) {
-//                    try {
-//                        in.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//
-//        }
     }
 
     public static void makeDir(File dir) {
@@ -239,10 +180,6 @@ public class ExcelUtil {
             makeDir(dir.getParentFile());
         }
         dir.mkdir();
-    }
-    private void OkHttpRequst(){
-        String Url = "http://www.cqset.com:8081/api/v2/version/check_version";
-
     }
 
 }
