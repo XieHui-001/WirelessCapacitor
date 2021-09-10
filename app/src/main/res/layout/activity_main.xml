@@ -354,15 +354,15 @@
             android:layout_marginRight="@dimen/dp_10" />
 
     </ScrollView>
-    <com.wang.avi.AVLoadingIndicatorView
-        android:id="@+id/avi"
-        style="@style/AVLoadingIndicatorView"
-        android:layout_width="100dp"
-        android:layout_height="150dp"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        app:indicatorColor="@color/green"
-        app:indicatorName="BallGridPulseIndicator" />
+<!--    <com.wang.avi.AVLoadingIndicatorView-->
+<!--        android:id="@+id/avi"-->
+<!--        style="@style/AVLoadingIndicatorView"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="150dp"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:layout_gravity="center"-->
+<!--        app:indicatorColor="@color/green"-->
+<!--        app:indicatorName="BallGridPulseIndicator" />-->
 <!--    <View-->
 <!--        android:layout_width="0dp"-->
 <!--        android:layout_height="0dp"-->

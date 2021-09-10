@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.wirelesscapacitor"
-    android:versionCode="10028"
-    android:versionName="00027"
+    android:versionCode="10048"
+    android:versionName="00047"
     tools:ignore="ProtectedPermissions"
     >
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />

@@ -37,8 +37,18 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
         String CutAuio = dest.replace("AUTO", "");
         String Now_ = CutAuio.replace("+", "");
         String Now__ = Now_.replace(" ", "");
-        String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
-        GetNOWVALUE.replace("-", "");
+
+
+        String GetNOWVALUE_ = Now__.substring(0, Now_.length() - 1);
+        String IndexoFCut = GetNOWVALUE_.substring(1, GetNOWVALUE_.length());
+        String NoeStr = GetNOWVALUE_.substring(0, 1);
+        String SUmStr = IndexoFCut.replace("-", " ");
+        String GetNOWVALUE = NoeStr + SUmStr;
+
+//        String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
+
+
+//        GetNOWVALUE.replace("-", "");
         if (GetNOWVALUE.contains("DC")) {
             GetNOWVALUE.replace("DC", "");
             helper.setText(R.id.dataType, "DC");
@@ -67,7 +77,7 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
         if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("V")) {
             helper.setText(R.id.dataUint, "mV");
         } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Ω")) {
-            helper.setText(R.id.dataType, "MΩ");
+            helper.setText(R.id.dataType, "电阻");
             helper.setText(R.id.dataUint, "MΩ");
         } else if (GetNOWVALUE.contains("Hz")) {
             helper.setText(R.id.dataUint, "Hz");
@@ -90,8 +100,14 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
             helper.setText(R.id.dataValue, GetNOWVALUE);
         }
         if (GetNOWVALUE.length() > 5) {
-            String Cut_Str = GetNOWVALUE.replace("-", "");
-            String CutString = Cut_Str.substring(0, 5);
+            String Cut_Str = GetNOWVALUE.replace(" ", "");
+            String CutString = null;
+            if (!Cut_Str.contains("-")){
+                CutString = Cut_Str.substring(0, 5);
+            }else{
+                CutString = Cut_Str.substring(0, 6);
+            }
+
             if (CutString.contains("ERRDC") || CutString.contains("ERRVC")) {
                 helper.setText(R.id.dataValue, "ERR");
             } else if (CutString.contains("?")) {

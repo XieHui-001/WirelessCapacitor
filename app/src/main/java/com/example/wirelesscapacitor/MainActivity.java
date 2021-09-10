@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
     private String Remote_AppName = null;
     private Context context;
     private AVLoadingIndicatorView avi;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        OpenAnimata();
+//        OpenAnimata();
 //        initCustomTimePicker();
         verifyStoragePermissions(MainActivity.this);
 //        StaggeredGridLayoutManager mLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
@@ -215,11 +216,11 @@ public class MainActivity extends AppCompatActivity {
         // Start Timer Just Get Tamp Hum Data
         Timer NowTimer = new Timer();
         NowTimer.schedule(ViewTask, 1000, 1000);
-        Timer Scroll =new Timer();
-        Scroll.schedule(ScroolView,200,200);
+        Timer Scroll = new Timer();
+        Scroll.schedule(ScroolView, 200, 200);
         MainBean mainBean = new MainBean();
-        AppVersion appVersion=new AppVersion();
-        NetUtil netWork=new NetUtil();
+        AppVersion appVersion = new AppVersion();
+        NetUtil netWork = new NetUtil();
         TextView temBut = (TextView) findViewById(R.id.TextTemBut);
         temBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,13 +254,20 @@ public class MainActivity extends AppCompatActivity {
         }
         handler.postDelayed(runnable, TIME); // 开启定时器更新UI
     }
-    private void OpenAnimata() {
-        setContentView(R.layout.activity_main);
-        String indicator = getIntent().getStringExtra("game");
-        avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
-        avi.setIndicator(indicator);
-        avi.hide();
-    }
+
+//    private void OpenAnimata() {
+//        MainActivity.this.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                setContentView(R.layout.activity_main);
+//                String indicator = getIntent().getStringExtra("game");
+//                avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
+//                avi.setIndicator(indicator);
+//                avi.hide();
+//            }
+//        });
+//    }
+
     //    private void Index(){
 //        if (mData!=null){
 //        recyclerView.scrollToPosition(CurrentIndex);
@@ -385,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "cannot open, maybe this chip has no support, please use PL2303HXD / RA / EA chip.");
                 }
             } else {
-
                 Toast.makeText(this, "connected : OK", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "connected : OK");
                 Log.d(TAG, "Exit  openUsbSerial");
@@ -564,19 +571,21 @@ public class MainActivity extends AppCompatActivity {
             SxView();
         }
     };
-    TimerTask ScroolView =new TimerTask() {
+    TimerTask ScroolView = new TimerTask() {
         @Override
         public void run() {
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    RecyclerView recyclerView=(RecyclerView) findViewById(R.id.historical_pictures_rv);
-                    recyclerView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            recyclerView.scrollToPosition(mData.size() - 1);
-                        }
-                    });
+                    if (MainBean.Instance.getTemperature() != null) {
+                        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.historical_pictures_rv);
+                        recyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerView.scrollToPosition(mData.size() - 1);
+                            }
+
+                        });
 //                    ScrollView scrollView=(ScrollView) findViewById(R.id.scrollView);
 //                    scrollView.post(new Runnable() {
 //                    public void run() {
@@ -593,6 +602,7 @@ public class MainActivity extends AppCompatActivity {
 //                            });
 //                        }
 //                    });
+                    }
                 }
             });
 
@@ -605,7 +615,8 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, 10086);
 
     }
-    private  void AviHide(){
+
+    private void AviHide() {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -613,6 +624,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     // Enabling external Applications Just Now
     public void _ApplicationsForStart() {
         try {
@@ -902,17 +914,15 @@ public class MainActivity extends AppCompatActivity {
                         int CutLenght = sumindex.length() / 2;
                         String Temp = index_3.substring(0, CutLenght);
                         String humidity = index_3.substring(CutLenght, index_3.length());
-                        String humidity_Show = humidity + " RH";
+                        String humidity_Show = humidity + " RH %";
                         humidity_Show.replace(" ", "");
                         String CutString = "设备号:" + MainBean.Instance.getId() + ":数据:" + MainBean.Instance.getCapacitance() + ":温度:" + Temp + ":湿度:" + humidity_Show + ":记录时间:" + MainBean.Instance.getTiem();
                         Pattern pattern1 = Pattern.compile("\t|\r|\n|\\s*");
                         Matcher matcher1 = pattern1.matcher(CutString);
                         String dest1 = matcher1.replaceAll("");
                         MyLog.e("", dest1.replace(" ", ""));
-//                        NowTamp.setText("current temperature " + Temp + " C°");
-//                        NowHum.setText("current humidity " + humidity_Show);
-                        HumiValue.setText(Temp + "℃");
-                        TempValue.setText(humidity_Show + "℃");
+                        HumiValue.setText(humidity_Show );
+                        TempValue.setText( Temp + "℃");
                     } catch (Exception ex) {
                         MyErrorLog.e("Error info", ex.toString());
                     }
@@ -924,20 +934,29 @@ public class MainActivity extends AppCompatActivity {
                         Matcher matcher = pattern.matcher(capact);
                         String dest = matcher.replaceAll("");
                         String CutAuio = dest.replace("AUTO", "");
-                        String Now_ = CutAuio.replace("+", "");
+                        String Now_ = CutAuio.replace("", "");
                         String Now__ = Now_.replace(" ", "");
                         String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
-                        if (GetNOWVALUE.contains("ERR")) {
+                        String IndexoFCut = GetNOWVALUE.substring(1,GetNOWVALUE.length());
+                        String NoeStr = GetNOWVALUE.substring(0,1);
+                        String SUmStr = IndexoFCut.replace("-"," ") ;
+                        String NowValue_ = NoeStr+SUmStr;
+                        String regEx="[`~!@#$%^&*()+=|{}':;'\\[\\]<>/?~！@#￥%……&*（）|{}【】'；：”“’。、？]";
+                        Pattern p = Pattern.compile(regEx);
+                        Matcher m = p.matcher(NowValue_);
+                        String toSpeechText=m.replaceAll("").trim();
+                        if (toSpeechText.contains("ERR")) {
                             capacitance.setText("ERR");
-                        } else if (GetNOWVALUE.contains("?")) {
+                        } else if (toSpeechText.contains("?")) {
                             capacitance.setText("ERR");
-                        }else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("V")){
-                            GetNOWVALUE.replace("m-V","mV");
-                            String NOwValue = GetNOWVALUE;
+                        } else if (toSpeechText.contains("m") && GetNOWVALUE.contains("V")) {
+                            toSpeechText.replace("-m-V", "mV");
+                            String NOwValue = toSpeechText;
                             capacitance.setText(NOwValue);
                         } else {
-                            capacitance.setText(GetNOWVALUE);
+                            capacitance.setText(toSpeechText);
                         }
+                        MyErrorLog.e("获取异常数据",toSpeechText);
                         //if (GetNOWVALUE.contains("AC")) {
                         //                            NowImgSum.setImageResource(R.mipmap.ic_current);
                         //                            NowElectricity.setText("交流电流");
@@ -960,6 +979,9 @@ public class MainActivity extends AppCompatActivity {
                         } else if (GetNOWVALUE.contains("AC") && GetNOWVALUE.contains("V")) {
                             NowImgSum.setImageResource(R.mipmap.ic_voltage);
                             NowElectricity.setText("交流电流");
+                        }else if (GetNOWVALUE.contains("Ω")){
+                            NowImgSum.setImageResource(R.mipmap.ic_resistance);
+                            NowElectricity.setText("电阻");
                         }
                     } catch (Exception exception) {
                         MyErrorLog.e("Now Get Capacitance Found ", "Error info " + exception);
@@ -987,6 +1009,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private void OkHttpVersionRequst() {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
@@ -994,44 +1017,44 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     int NwtWrok = NetUtil.getNetWorkStart(MainActivity.this);
                     if (NwtWrok > 0) {
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
-                    MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-                    RequestBody body = RequestBody.create(mediaType, "name=在线监测安卓&department=南电科技&plat=android");
-                    Request request = new Request.Builder()
-                            .url("http://www.cqset.com:8081/api/v2/version/check_version?name=在线监测安卓&department=南电科技&plat=android")
-                            .method("POST", body)
-                            .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                            .build();
-                    try {
-                        Response response = client.newCall(request).execute();
-                        String jsonData = response.body().string();
-                        JSONObject jsonObject1 = null;
-                        jsonObject1 = (JSONObject) JSON.parseObject(jsonData);
-                        String Getdata = jsonObject1.getString("data");
-                        jsonObject1 = JSON.parseObject(Getdata);
-                        String VersionNow = jsonObject1.getString("version");
-                        String DonwloadPath = jsonObject1.getString("path");
-                        String description = jsonObject1.getString("description");
-                        String AppName = jsonObject1.getString("app_name");
-                        Remote_update_address = DonwloadPath;
-                        RemoteAppVersion = VersionNow;
-                        Remote_description = description;
-                        Remote_AppName = AppName;
-                        int Version = Integer.parseInt(VersionNow.replace(" ", ""));
-                        int LocalVersion = getVersionCode(context);
-                        MyErrorLog.e("本地版本:",""+LocalVersion);
-                        if (Version > LocalVersion ) {
-                            MyErrorLog.e("本地版本小于服务器版本:",""+LocalVersion);
-                            UpdateTip();
+                        OkHttpClient client = new OkHttpClient().newBuilder()
+                                .build();
+                        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                        RequestBody body = RequestBody.create(mediaType, "name=在线监测安卓&department=南电科技&plat=android");
+                        Request request = new Request.Builder()
+                                .url("http://www.cqset.com:8081/api/v2/version/check_version?name=在线监测安卓&department=南电科技&plat=android")
+                                .method("POST", body)
+                                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                                .build();
+                        try {
+                            Response response = client.newCall(request).execute();
+                            String jsonData = response.body().string();
+                            JSONObject jsonObject1 = null;
+                            jsonObject1 = (JSONObject) JSON.parseObject(jsonData);
+                            String Getdata = jsonObject1.getString("data");
+                            jsonObject1 = JSON.parseObject(Getdata);
+                            String VersionNow = jsonObject1.getString("version");
+                            String DonwloadPath = jsonObject1.getString("path");
+                            String description = jsonObject1.getString("description");
+                            String AppName = jsonObject1.getString("app_name");
+                            Remote_update_address = DonwloadPath;
+                            RemoteAppVersion = VersionNow;
+                            Remote_description = description;
+                            Remote_AppName = AppName;
+                            int Version = Integer.parseInt(VersionNow.replace(" ", ""));
+                            int LocalVersion = getVersionCode(context);
+                            MyErrorLog.e("本地版本:", "" + LocalVersion);
+                            if (Version > LocalVersion) {
+                                MyErrorLog.e("本地版本小于服务器版本:", "" + LocalVersion);
+                                UpdateTip();
+                            }
+                            MyErrorLog.e("API Response ", Getdata + "----" + VersionNow + "----" + DonwloadPath);
+                        } catch (IOException e) {
+                            MyErrorLog.e("API Resqus Error", "info:  " + e);
+                            e.printStackTrace();
                         }
-                        MyErrorLog.e("API Response ", Getdata + "----" + VersionNow + "----" + DonwloadPath);
-                    } catch (IOException e) {
-                        MyErrorLog.e("API Resqus Error", "info:  " + e);
-                        e.printStackTrace();
-                    }
-                    }else{
-                        MyErrorLog.e("未检测到当前网络","无网络使用");
+                    } else {
+                        MyErrorLog.e("未检测到当前网络", "无网络使用");
                     }
                 } catch (Exception exception) {
                     MyErrorLog.e("Net Wrok", "Error:   " + exception);
@@ -1238,7 +1261,7 @@ public class MainActivity extends AppCompatActivity {
                             bufferedSink.writeAll(response.body().source());
                             bufferedSink.close();
                             MyErrorLog.d("DOWNLOAD", "Total download event =" + (System.currentTimeMillis() - startTime) / 1000 + "：秒");
-                            AviHide();
+//                            AviHide();
                             _ApplicationsForStart();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1253,7 +1276,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
-    private void Screed(){
+
+    private void Screed() {
 
     }
 }
