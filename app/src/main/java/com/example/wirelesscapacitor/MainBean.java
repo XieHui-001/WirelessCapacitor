@@ -3,10 +3,10 @@ package com.example.wirelesscapacitor;
 import java.io.Serializable;
 
 public class MainBean implements Serializable {
-    private String id;//设备id
-    private String tiem;//时间
-    private String capacitance;//电容
-    private String temperature;//温度
+    public String id;//设备id
+    public String tiem;//时间
+    public String capacitance;//电容
+    public String temperature;//温度
     public static  MainBean Instance = null;
 
     public  MainBean(){

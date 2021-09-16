@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.wirelesscapacitor"
-    android:versionCode="10048"
-    android:versionName="00047"
-    tools:ignore="ProtectedPermissions"
-    >
+    android:installLocation="internalOnly"
+    android:versionCode="10087"
+    android:versionName="00086"
+    tools:ignore="ProtectedPermissions">
+
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -27,6 +28,7 @@
     <uses-permission android:name="android.permission.REPLACE_EXISTING_PACKAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ico"
@@ -35,9 +37,14 @@
         android:roundIcon="@drawable/ico"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".dialog_edit"
+            android:exported="true" />
+
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/network_security_config" />
+
         <activity android:name=".moudle.MaActivity" />
         <activity
             android:name=".MainActivity"
@@ -49,6 +56,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="camera.photos.fileprovider"
@@ -58,5 +66,25 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/install_file" />
         </provider>
+
+<!--        <receiver-->
+<!--            android:name=".BootReceiver"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter android:priority="1000">-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
+
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
     </application>
+
 </manifest>

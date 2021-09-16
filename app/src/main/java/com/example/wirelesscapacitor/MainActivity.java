@@ -2,6 +2,7 @@ package com.example.wirelesscapacitor;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -178,13 +179,15 @@ public class MainActivity extends AppCompatActivity {
     private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-M-d");
     private String LogsOutName = "ClassExeLogs.log";
 
-
+    public static MainActivity Instance = null;
     private String Remote_update_address = null;
     private String RemoteAppVersion = null;
     private String Remote_description = null;
     private String Remote_AppName = null;
     private Context context;
     private AVLoadingIndicatorView avi;
+
+    public static String NewDeviceName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,11 +207,13 @@ public class MainActivity extends AppCompatActivity {
         verifyStoragePermissions(MainActivity.this);
 //        StaggeredGridLayoutManager mLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
 //        recyclerView.setLayoutManager(mLayoutManager);
+
         adapter = new MainAdapter(mData);
         historicalPicturesRv.setLayoutManager(new LinearLayoutManager(this));
         historicalPicturesRv.setAdapter(adapter);
         try {
             OkHttpVersionRequst();
+//            isUIProcess();
         } catch (Exception ex) {
             Toast.makeText(MainActivity.this, "检查版本更新时错误", Toast.LENGTH_SHORT).show();
         }
@@ -218,9 +223,19 @@ public class MainActivity extends AppCompatActivity {
         NowTimer.schedule(ViewTask, 1000, 1000);
         Timer Scroll = new Timer();
         Scroll.schedule(ScroolView, 200, 200);
+        Timer DeviceNames = new Timer();
+        DeviceNames.schedule(DeviceTimerTask, 2000, 2000);
         MainBean mainBean = new MainBean();
         AppVersion appVersion = new AppVersion();
         NetUtil netWork = new NetUtil();
+        DeviceName deviceName = new DeviceName();
+//        try {
+//            if (MainBean.Instance.id!=null && MainBean.Instance.id!=""){
+//                TimerTask_GetNewDeviceName();
+//            }
+//        }catch (Exception exception){
+//            MyErrorLog.e("初始化获取名称错误","获取设备名称错误");
+//        }
         TextView temBut = (TextView) findViewById(R.id.TextTemBut);
         temBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,6 +247,21 @@ public class MainActivity extends AppCompatActivity {
                             .setIcon(R.drawable.tem)//图标
                             .create();
                     alertDialog1.show();
+                }
+            }
+        });
+        TextView UpdateDeviceName = (TextView) findViewById(R.id.devicename);
+        UpdateDeviceName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    if (MainBean.Instance.id != null && MainBean.Instance.id != "") {
+                        EditText device_TextNames = (EditText) findViewById(R.id.DeviceInfo);
+                        dialog_edit.normalDialog(MainActivity.this, device_TextNames);
+
+                    }
+                } catch (Exception exception) {
+                    MyErrorLog.e("更改设备名称错误", exception.toString());
                 }
             }
         });
@@ -291,7 +321,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    public MainActivity(){
+        MainActivity.Instance = this;
+    }
     protected void onStop() {
         handler.removeCallbacks(runnable);//停止计时器
         Log.d(TAG, "Enter onStop");
@@ -921,8 +953,8 @@ public class MainActivity extends AppCompatActivity {
                         Matcher matcher1 = pattern1.matcher(CutString);
                         String dest1 = matcher1.replaceAll("");
                         MyLog.e("", dest1.replace(" ", ""));
-                        HumiValue.setText(humidity_Show );
-                        TempValue.setText( Temp + "℃");
+                        HumiValue.setText(humidity_Show);
+                        TempValue.setText(Temp + "℃");
                     } catch (Exception ex) {
                         MyErrorLog.e("Error info", ex.toString());
                     }
@@ -937,14 +969,14 @@ public class MainActivity extends AppCompatActivity {
                         String Now_ = CutAuio.replace("", "");
                         String Now__ = Now_.replace(" ", "");
                         String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
-                        String IndexoFCut = GetNOWVALUE.substring(1,GetNOWVALUE.length());
-                        String NoeStr = GetNOWVALUE.substring(0,1);
-                        String SUmStr = IndexoFCut.replace("-"," ") ;
-                        String NowValue_ = NoeStr+SUmStr;
-                        String regEx="[`~!@#$%^&*()+=|{}':;'\\[\\]<>/?~！@#￥%……&*（）|{}【】'；：”“’。、？]";
+                        String IndexoFCut = GetNOWVALUE.substring(1, GetNOWVALUE.length());
+                        String NoeStr = GetNOWVALUE.substring(0, 1);
+                        String SUmStr = IndexoFCut.replace("-", " ");
+                        String NowValue_ = NoeStr + SUmStr;
+                        String regEx = "[`~!@#$%^&*()+=|{}':;'\\[\\]<>/?~！@#￥%……&*（）|{}【】'；：”“’。、？]";
                         Pattern p = Pattern.compile(regEx);
                         Matcher m = p.matcher(NowValue_);
-                        String toSpeechText=m.replaceAll("").trim();
+                        String toSpeechText = m.replaceAll("").trim();
                         if (toSpeechText.contains("ERR")) {
                             capacitance.setText("ERR");
                         } else if (toSpeechText.contains("?")) {
@@ -956,7 +988,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             capacitance.setText(toSpeechText);
                         }
-                        MyErrorLog.e("获取异常数据",toSpeechText);
+                        MyErrorLog.e("获取异常数据", toSpeechText);
                         //if (GetNOWVALUE.contains("AC")) {
                         //                            NowImgSum.setImageResource(R.mipmap.ic_current);
                         //                            NowElectricity.setText("交流电流");
@@ -979,7 +1011,14 @@ public class MainActivity extends AppCompatActivity {
                         } else if (GetNOWVALUE.contains("AC") && GetNOWVALUE.contains("V")) {
                             NowImgSum.setImageResource(R.mipmap.ic_voltage);
                             NowElectricity.setText("交流电流");
-                        }else if (GetNOWVALUE.contains("Ω")){
+                        } else if (GetNOWVALUE.contains("n") && GetNOWVALUE.contains("f")) {
+                            NowElectricity.setText("电容");
+                        }else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")){
+                            NowElectricity.setText("二极管");
+                        }else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")) {
+                            NowImgSum.setImageResource(R.mipmap.ic_resistance);
+                            NowElectricity.setText("电阻");
+                        }else if (GetNOWVALUE.contains("Ω")) {
                             NowImgSum.setImageResource(R.mipmap.ic_resistance);
                             NowElectricity.setText("电阻");
                         }
@@ -1093,7 +1132,6 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                avi.show();
                 if (dirs.exists()) {
                     dirs.delete();
                 }
@@ -1277,7 +1315,144 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void Screed() {
+    public boolean isUIProcess() {
+        ActivityManager am = ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+        String mainProcessName = getPackageName();
+        int myPid = android.os.Process.myPid();
+        MyLog.e("Process", "进程 " + mainProcessName + "------PID" + myPid);
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    TimerTask DeviceTimerTask = new TimerTask() {
+        @Override
+        public void run() {
+            try {
+                if (MainBean.Instance.id != null && MainBean.Instance.id != "") {
+                    TimerTask_GetNewDeviceName();
+                }
+            } catch (Exception ex) {
+                MyErrorLog.e("DeviceTimerTask Error ", ex);
+            }
+        }
+    };
+
+    private void TimerTask_GetNewDeviceName() {
+        try {
+            File dir = Environment.getExternalStorageDirectory();
+            File dirs = new File(dir.getPath() + "/LocalAppLogs/log/Device/Device.log");
+            if (dirs.exists()) {
+                FileInputStream fileInputStream = null;
+                try {
+                    // 1.打开文件
+                    fileInputStream = new FileInputStream(dirs);
+                    // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+                    String line = null;
+                    StringBuilder builder = new StringBuilder();
+                    while ((line = reader.readLine()) != null) {
+                        builder.append(line);
+                        if (line.contains(MainBean.Instance.id)) {
+                            String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
+                            String Cutins = Cut_IndexOF.replace(":", "");
+                            DeviceName.Instance.setDeviceName(Cutins);
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    MyErrorLog.e("适配器错误:Error", "info:" + e);
+                } finally {
+                    if (fileInputStream != null) {
+                        try {
+                            fileInputStream.close();
+                        } catch (IOException e) {
+                            MyErrorLog.e("适配器错误:Error", "info:" + e);
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } else {
+                MyErrorLog.e("Device Local File Not Found:", "该文件不存在文件不存在");
+            }
+        } catch (Exception exception) {
+            MyErrorLog.e("Red Device Logs Error", "info : " + exception);
+        }
+    }
+
+    public void NewTimerTask_GetNewDeviceName(String str) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    int sum = 0;
+                    EditText editText=(EditText) findViewById(R.id.DeviceInfo);
+                    List<DeviceSumStr> deviceSumStrs = new ArrayList<>();
+                    File dir = Environment.getExternalStorageDirectory();
+                    File dirs = new File(dir.getPath() + "/LocalAppLogs/log/Device/Device.log");
+                    if (dirs.exists()) {
+                        FileInputStream fileInputStream = null;
+                        try {
+                            // 1.打开文件
+                            fileInputStream = new FileInputStream(dirs);
+                            // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+                            String line = null;
+                            StringBuilder builder = new StringBuilder();
+
+                            while ((line = reader.readLine()) != null) {
+                                if (line.contains(MainBean.Instance.id)) {
+                                    sum = sum + 1;
+                                    DeviceSumStr deviceSumStr = new DeviceSumStr(line);
+                                    deviceSumStrs.remove(deviceSumStr);
+                                } else {
+                                    DeviceSumStr deviceSumStr = new DeviceSumStr(line);
+                                    deviceSumStrs.add(deviceSumStr);
+                                }
+                                if (sum == 1) {
+                                    if (str!=null && str!=""){
+                                    LocalDeviceName.DeleteFileNow();
+                                    DeviceSumStr deviceSumStr = new DeviceSumStr(MainBean.Instance.id+":"+str);
+                                    deviceSumStrs.add(deviceSumStr);
+                                    builder.append(line);
+                                    }
+                                } else if (sum < 1){
+                                    String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
+                                    String Cutins = Cut_IndexOF.replace(":", "");
+                                    DeviceName.Instance.setDeviceName(Cutins);
+                                    break;
+                                }
+                            }
+                            if (deviceSumStrs.size() >= 1&& sum >=1) {
+                                for (int i = 0; i < deviceSumStrs.size(); i++) {
+                                    if (DeviceName.Instance.DeviceName_ != null && DeviceName.Instance.DeviceName_ != "") {
+                                        LocalDeviceName.e("", deviceSumStrs.get(i).DeviceStr);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            MyErrorLog.e("适配器错误:Error", "info:" + e);
+                        } finally {
+                            if (fileInputStream != null) {
+                                try {
+                                    fileInputStream.close();
+                                } catch (IOException e) {
+                                    MyErrorLog.e("适配器错误:Error", "info:" + e);
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception exception) {
+                    MyErrorLog.e("Red Device Logs Error", "info : " + exception);
+                }
+            }
+        }).start();
     }
 }

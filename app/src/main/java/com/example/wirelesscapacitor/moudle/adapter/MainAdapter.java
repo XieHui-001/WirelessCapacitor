@@ -1,16 +1,24 @@
 package com.example.wirelesscapacitor.moudle.adapter;
 
+import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.example.wirelesscapacitor.DeviceName;
 import com.example.wirelesscapacitor.MainActivity;
 import com.example.wirelesscapacitor.MainBean;
+import com.example.wirelesscapacitor.MyErrorLog;
 import com.example.wirelesscapacitor.MyLog;
 import com.example.wirelesscapacitor.R;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,10 +30,13 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
     public MainAdapter(@Nullable List<MainBean> data) {
         super(R.layout.item_main, data);
     }
-
     @Override
     protected void convert(BaseViewHolder helper, MainBean item) {
+        try{
+
+
         MainActivity.CurrentIndex = MainActivity.CurrentIndex + 1;
+
 //        helper.setText(R.id.name, item.getId());//设备名
 //        helper.setText(R.id.time, item.getTiem());//时间
 //        helper.setText(R.id.data, item.getCapacitance());//数据
@@ -44,11 +55,6 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
         String NoeStr = GetNOWVALUE_.substring(0, 1);
         String SUmStr = IndexoFCut.replace("-", " ");
         String GetNOWVALUE = NoeStr + SUmStr;
-
-//        String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
-
-
-//        GetNOWVALUE.replace("-", "");
         if (GetNOWVALUE.contains("DC")) {
             GetNOWVALUE.replace("DC", "");
             helper.setText(R.id.dataType, "DC");
@@ -89,6 +95,27 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
             helper.setText(R.id.dataUint, "V");
         } else if (GetNOWVALUE.contains("A")) {
             helper.setText(R.id.dataUint, "A");
+        } else if (GetNOWVALUE.contains("n") && GetNOWVALUE.contains("f")) {
+            helper.setText(R.id.dataType, "电容");
+            helper.setText(R.id.dataUint, "nF");
+        } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("f")) {
+            helper.setText(R.id.dataType, "电容");
+            helper.setText(R.id.dataUint, "mF");
+        } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("f")) {
+            helper.setText(R.id.dataType, "电容");
+            helper.setText(R.id.dataUint, "uF");
+        } else if (GetNOWVALUE.contains("f")) {
+            helper.setText(R.id.dataType, "电容");
+            helper.setText(R.id.dataUint, "F");
+        }else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")){
+            helper.setText(R.id.dataType, "电阻");
+            helper.setText(R.id.dataUint, "kΩ");
+        }else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")){
+            helper.setText(R.id.dataType, "二极管");
+            helper.setText(R.id.dataUint, "V");
+        }else if (GetNOWVALUE.contains("Ω")){
+            helper.setText(R.id.dataType, "电阻");
+            helper.setText(R.id.dataUint, "Ω");
         }
 
         if (GetNOWVALUE.contains("ERRDC") || GetNOWVALUE.contains("ERRVC")) {
@@ -102,9 +129,9 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
         if (GetNOWVALUE.length() > 5) {
             String Cut_Str = GetNOWVALUE.replace(" ", "");
             String CutString = null;
-            if (!Cut_Str.contains("-")){
+            if (!Cut_Str.contains("-")) {
                 CutString = Cut_Str.substring(0, 5);
-            }else{
+            } else {
                 CutString = Cut_Str.substring(0, 6);
             }
 
@@ -122,9 +149,19 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
                 }
             }
         }
-        helper.setText(R.id.test1, item.getId()); //设备名
+
+        if (DeviceName.Instance.DeviceName_ != null && DeviceName.Instance.DeviceName_!="") {
+            MyErrorLog.e("不等于空进入",DeviceName.Instance.DeviceName_);
+            helper.setText(R.id.test1, DeviceName.Instance.DeviceName_);  // Update New Device Name
+        } else {
+            MyErrorLog.e("条件错误","");
+            helper.setText(R.id.test1, item.getId());  //设备名
+        }
 //        helper.setText(R.id.test2, item.getCapacitance()); //数据
         helper.setText(R.id.test3, item.getTemperature()); //温度
         helper.setText(R.id.test4, item.getTiem()); //时间
+        }catch (Exception exception){
+            MyErrorLog.e("适配器错误 Item Error ","info :" +exception.toString());
+        }
     }
 }
