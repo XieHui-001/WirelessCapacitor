@@ -296,7 +296,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="2dp"
                     android:layout_marginRight="17dp"
-                    android:text="三项平移"
+                    android:text="三相平移"
                     android:textColor="@color/color_white"
                     android:textSize="12sp" />
 

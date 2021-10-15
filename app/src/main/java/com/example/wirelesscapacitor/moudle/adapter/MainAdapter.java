@@ -42,6 +42,26 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
     protected void convert(BaseViewHolder helper, MainBean item) {
         try {
             MainActivity.CurrentIndex = MainActivity.CurrentIndex + 1;
+            if (Device_Info.Instance.nOTnuLL == null || !Device_Info.Instance.nOTnuLL.equals(item.id)) {
+                final String ISnull = MainActivity.Instance.TimerTask_GetNewDeviceName(item.id);
+                if (ISnull != null) {
+                    MyErrorLog.e("Qut Device Name VAlue", ":" + ISnull);
+                    Device_Info.Instance.setnOTnuLL(ISnull);
+                    Device_Info.Instance.setNoTnull_id(item.id);
+                    helper.setText(R.id.test1, ISnull != null ? ISnull : ISnull);
+                } else {
+                    final String TwoName = MainActivity.Instance.TimerTask_GetNewDeviceName(item.id);
+                    MyErrorLog.e("2222", "");
+                    if (TwoName == null) {
+                        helper.setText(R.id.test1, (TwoName != null ? TwoName : Device_Info.Instance.nOTnuLL));
+                    } else {
+                        helper.setText(R.id.test1, TwoName != null ? TwoName : item.id);
+                    }
+                }
+            } else {
+                MyErrorLog.e("3333", "");
+                helper.setText(R.id.test1, item.id); //Device_Info.Instance.nOTnuLL
+            }
             if (myData != item.getCapacitance()) {
                 myData = item.getCapacitance();
                 Pattern pattern = Pattern.compile("\t|\r|\n|\\s*");
@@ -157,21 +177,7 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
 //                    helper.setText(R.id.test1, DeviceName.Instance.DeviceName_);  // Update New Device Name
 //                }
 
-                if (Device_Info.Instance.nOTnuLL == null || !Device_Info.Instance.nOTnuLL.equals(item.id)) {
-                    String ISnull = MainActivity.Instance.TimerTask_GetNewDeviceName(item.id);
-                    if (ISnull != null) {
-                        MyErrorLog.e("Qut Device Name VAlue", ":" + ISnull);
-                        Device_Info.Instance.setnOTnuLL(ISnull);
-                        Device_Info.Instance.setNoTnull_id(item.id);
-                        helper.setText(R.id.test1, ISnull != null ? Device_Info.Instance.nOTnuLL : ISnull);
-                    } else {
-                        MyErrorLog.e("2222", "");
-                        helper.setText(R.id.test1, ISnull != null ? Device_Info.Instance.nOTnuLL : item.id);
-                    }
-                } else {
-                    MyErrorLog.e("3333", "");
-                    helper.setText(R.id.test1, Device_Info.Instance.nOTnuLL);
-                }
+
                 helper.setText(R.id.test3, item.getTemperature()); //温度
                 helper.setText(R.id.test4, item.getTiem()); //时间
             }

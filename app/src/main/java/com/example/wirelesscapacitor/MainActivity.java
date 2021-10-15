@@ -1574,7 +1574,7 @@ public class MainActivity extends AppCompatActivity {
                             String line = null;
                             StringBuilder builder = new StringBuilder();
                             while ((line = reader.readLine()) != null) {
-                                builder.append(line);
+//                                builder.append(line);
 //                        if (line.contains(MainBean.Instance.id)) {
 //                            String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
 //                            String Cutins = Cut_IndexOF.replace(":", "");
