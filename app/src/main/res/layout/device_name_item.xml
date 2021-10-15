@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:background="@color/green"
+    android:orientation="horizontal">
+
+
+    //#50323232
+    <!--<TextView-->
+    <!--    android:textIsSelectable="true"-->
+    <!--    android:layout_width="0dp"-->
+    <!--    android:layout_weight="1"-->
+    <!--    android:layout_height="40dp"-->
+    <!--    android:textSize="14dp"-->
+    <!--    android:gravity="center"-->
+    <!--    android:textStyle="bold"-->
+    <!--    android:textColor="@color/green"-->
+    <!--    android:id="@+id/item_device_name"-->
+    <!--    />-->
+    <!--    <TextView-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_weight="1"-->
+    <!--        android:textSize="12dp"-->
+    <!--        android:layout_height="40dp"-->
+    <!--        android:paddingRight="10dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:textColor="@color/blue"-->
+    <!--        android:id="@+id/item_device_data"-->
+    <!--        />-->
+    <!--    <TextView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:textSize="12dp"-->
+    <!--        android:layout_marginRight="25dp"-->
+    <!--        android:layout_height="40dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:id="@+id/temp"-->
+    <!--        android:textColor="@color/orange2"-->
+    <!--        />-->
+    <!--    <TextView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:textSize="12dp"-->
+    <!--        android:layout_height="40dp"-->
+    <!--        android:layout_marginRight="25dp"-->
+    <!--        android:gravity="center"-->
+    <!--        android:textColor="@color/purple"-->
+    <!--        android:id="@+id/humi"-->
+    <!--        />-->
+    <!--&lt;!&ndash;    <EditText&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:layout_width="100dp"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:layout_height="40dp"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:id="@+id/edit_value"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:textSize="12dp"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:gravity="center"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:hint="修改设备名称"&ndash;&gt;-->
+    <!--&lt;!&ndash;        />&ndash;&gt;-->
+    <!--&lt;!&ndash;    <TextView&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:layout_width="80dp"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:layout_height="40dp"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:gravity="center"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:textColor="@color/green"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:text="确认修改"&ndash;&gt;-->
+    <!--&lt;!&ndash;        android:id="@+id/updatedevice"&ndash;&gt;-->
+    <!--&lt;!&ndash;        />&ndash;&gt;-->
+    <!--    <ImageView-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:layout_width="20dp"-->
+    <!--        android:layout_height="20dp"-->
+    <!--        android:layout_marginRight="10dp"-->
+    <!--        android:src="@drawable/sum_black"-->
+    <!--        android:id="@+id/sumdevice"-->
+    <!--        />-->
+    <!--    <ImageView-->
+    <!--        android:layout_marginTop="5dp"-->
+    <!--        android:layout_width="30dp"-->
+    <!--        android:layout_height="30dp"-->
+    <!--        android:src="@drawable/updatename"-->
+    <!--        android:id="@+id/updatedevice"-->
+    <!--        />-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/green"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            android:background="@drawable/newliner">
+
+            <TextView
+                android:id="@+id/NewDevieName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:textColor="@color/color_white" />
+
+            <ImageView
+                android:id="@+id/update_new"
+                android:layout_width="20dp"
+                android:layout_height="30dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/bj" />
+        </RelativeLayout>
+
+        <!--电容-->
+        <RelativeLayout
+            android:id="@+id/main_capacitance"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_green"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <!--            <TextView-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="20dp"-->
+            <!--                android:layout_alignParentTop="true"-->
+            <!--                android:layout_marginBottom="50dp"-->
+            <!--                />-->
+            <ImageView
+                android:id="@+id/ImgSum_1"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_capacitance" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/Electricity_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/color_white"
+                    android:textSize="12sp" />
+
+
+                />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/capacitance_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:text="0F"
+                android:textColor="@color/color_white"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+        <!--电流-->
+        <RelativeLayout
+            android:id="@+id/main_current"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_orange"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:src="@drawable/wd" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginTop="7dp"
+                    android:gravity="center"
+                    android:text="温度"
+                    android:textColor="@color/color_white"
+                    android:textSize="12sp" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/temps_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:text="0 C°"
+                android:textColor="@color/color_white"
+                android:textSize="12sp" />
+        </RelativeLayout>
+
+        <!--电压-->
+        <RelativeLayout
+            android:id="@+id/main_voltage"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_pink"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:src="@drawable/sd" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginTop="7dp"
+                    android:gravity="center"
+                    android:text="湿度"
+                    android:textColor="@color/color_white"
+                    android:textSize="12sp" />
+                />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/humis_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="2dp"
+                android:gravity="center"
+                android:text="0 C°"
+                android:textColor="@color/color_white"
+                android:textSize="12sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_blue"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:src="@drawable/js" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="17dp"
+                    android:text="三项平移"
+                    android:textColor="@color/color_white"
+                    android:textSize="12sp" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/sumitem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/color_white"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -23,6 +23,7 @@ public class Decoder {
         }
         return ostr;
     }
+
     public static byte[] hexStr2Byte(String hex) {
         ByteBuffer bf = ByteBuffer.allocate(hex.length() / 2);
         for (int i = 0; i < hex.length(); i++) {
@@ -36,6 +37,7 @@ public class Decoder {
     }
 
     public static String Uints = null;
+
     public void Test() {
         String hex = "AAAF3900570010574241393933202B30303030203129040080000D0A54656D70203D2033332E31313020202048756D69203D2035332E3732300D0A87";
         byte[] rbuf = hexStr2Byte(hex);
@@ -95,7 +97,7 @@ public class Decoder {
         {
             byte[] dBuf = Arrays.copyOfRange(rbuf, dFirstIndx, dLastIndx);
             serData.DianROng = this.DianRongData(dBuf);//电容
-            MyErrorLog.e("电容数据",serData.DianROng);
+            MyErrorLog.e("电容数据", serData.DianROng);
         }
 
 
@@ -134,7 +136,7 @@ public class Decoder {
         String dataType = this.DataByte(dat);
         this.Space(dat[5]);
         dataType = this.Point(dataType, dat[6]);
-        MyErrorLog.e("数据状态",dataType);
+        MyErrorLog.e("数据状态", dataType);
         rstr += dataType;
 
         String sb1 = this.SB1(dat[7]);
@@ -178,21 +180,39 @@ public class Decoder {
 
     private String Point(String val, byte dat) {
         StringBuffer s1 = new StringBuffer(val);
-        MyErrorLog.e("原始Value",val+"原始 dat:"+dat);
+        String YesValue = "0.000";
+        MyErrorLog.e("原始Value", val + "原始 dat:" + dat);
         int point = dat;
         switch (point) {
             case 0x30:
                 break;
             case 0x31:
-                s1.insert(1, ".");
-                break;
+                if (val.contains("?")) {
+                    return YesValue;
+                } else {
+                    s1.insert(1, ".");
+                    break;
+                }
             case 0x32:
-                s1.insert(2, ".");
-                break;
+                if (val.contains("?")) {
+                    return YesValue;
+                } else {
+                    s1.insert(2, ".");
+                    break;
+                }
             case 0x33:
-                s1.insert(3, ".");
+                if (val.contains("?")) {
+                    return YesValue;
+                } else {
+                    s1.insert(3, ".");
+                    break;
+                }
             default:
-                return s1.insert(3, ".").toString();
+                if (val.contains("?")) {
+                    return YesValue;
+                } else {
+                    return s1.insert(3, ".").toString();
+                }
 //            case 0x34:
 //                return "ERR";
 ////                int idx = -1;

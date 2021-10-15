@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+    <LinearLayout
+        android:id="@+id/LinerLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/device_view"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/new_dataType"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/new_dataValue"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/new_dataUint"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+        <!--        <View-->
+        <!--            android:layout_width="0.5dp"-->
+        <!--            android:layout_height="70dp"-->
+        <!--            android:background="#e1ebf5" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/test2"-->
+        <!--            android:layout_width="103dp"-->
+        <!--            android:layout_height="70dp"-->
+        <!--            android:layout_below="@+id/LinerLayout1"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:gravity="center" />-->
+
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+
+
+        <TextView
+            android:id="@+id/new_temp"
+            android:layout_width="105dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_weight="1"
+            android:gravity="center" />
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="70dp"
+            android:background="#e1ebf5" />
+        <TextView
+            android:id="@+id/new_date"
+            android:layout_width="103dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/LinerLayout1"
+            android:layout_weight="1"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#e1ebf5"/>
+</LinearLayout>

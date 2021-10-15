@@ -10,13 +10,26 @@
       <map>
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22083333333333333" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/bg_white.xml" value="0.22083333333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/bt_green.xml" value="0.20364583333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/bt_orange.xml" value="0.209375" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/ic_launcher_background.xml" value="0.22083333333333333" />
-        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_dialog_edit.xml" value="0.20208333333333334" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/login_bt_red.xml" value="0.21927083333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/shape_corner_down.xml" value="0.334375" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/drawable/shape_corner_down_2.xml" value="0.21927083333333333" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_date_compute.xml" value="0.12681159420289856" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_dialog_edit.xml" value="0.25" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_ma.xml" value="0.1984375" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_main2.xml" value="0.2046875" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_new_historical_data.xml" value="0.33" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_reload_view.xml" value="0.33" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/activity_start_view.xml" value="0.203125" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/content_main.xml" value="0.15625" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/device_name_item.xml" value="0.5" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/fragment_blank.xml" value="0.203125" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/fragment_first.xml" value="0.2046875" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/fragment_second.xml" value="0.2046875" />
+        <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/historical_item.xml" value="0.192481884057971" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/layout/item_main.xml" value="0.25" />
         <entry key="..\:/Android/Demo/WirelessCapacitor/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.23854166666666668" />
       </map>

@@ -80,6 +80,9 @@
     <color name="line1fill">#ECEAD0</color>
     <color name="line2">#9F8FBA</color>
     <color name="line2fill">#EBE4F8</color>
+    <color name="newgray">#B2B2B2</color>
+    <color name="purple">#cc33ff</color>
+    <color name="origin">#ccff33</color>
     <!-- 回放，TimeBar底部可播放时间区域显示颜色 -->
     <color name="playback_timebar_color">#2e78c2</color>
 

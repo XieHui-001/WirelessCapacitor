@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
 import android.os.Build;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.text.format.Time;
@@ -67,6 +69,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,15 +117,25 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView historicalPicturesRv;
     @BindView(R.id.read_data)
     Button readData;
+//    @BindView(R.id.Device_1)
+//    TextView Device_1;
+//    @BindView(R.id.Device_2)
+//    TextView Device_2;
+//    @BindView(R.id.Device_3)
+//    TextView Device_3;
+//    @BindView(R.id.historical_data)
+//    ImageView historical_data;
 
 
     private TimePickerView mPickerOptions;//时间选择器
     private long startingTime;//开始时间
     private long endTime;//结束时间
     private MainAdapter adapter;
+    private device_Three_Item adapter_2;
     private List<MainBean> mData = new ArrayList<>();
 
     private List<ValueUtil> valueUtilList = new ArrayList<>();
+    public static List<Historical_Data_Value> historical_data_values = new ArrayList<>();
     // debug settings
     // private static final boolean SHOW_DEBUG = false;
     private static final boolean SHOW_DEBUG = true;
@@ -176,8 +194,6 @@ public class MainActivity extends AppCompatActivity {
     private String NowTemp = null;
     private String NowHumi = null;
     private RecyclerView recyclerView;
-    private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-M-d");
-    private String LogsOutName = "ClassExeLogs.log";
 
     public static MainActivity Instance = null;
     private String Remote_update_address = null;
@@ -186,8 +202,15 @@ public class MainActivity extends AppCompatActivity {
     private String Remote_AppName = null;
     private Context context;
     private AVLoadingIndicatorView avi;
-
+    private TimePickerView pvTime;
+    public static String historical_data_info = null;
     public static String NewDeviceName = null;
+    public static List<String> StrList = new ArrayList<>();
+    private RecyclerView myRecy;
+    private PowerManager.WakeLock wakeLock = null;
+
+    private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+    private ReadWriteLock rwl = new ReentrantReadWriteLock();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,20 +220,31 @@ public class MainActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE); /**标题是属于View的，所以窗口所有的修饰部分被隐藏后标题依然有效,需要去掉标题**/
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, MainActivity.class.getName());
+//        wakeLock.acquire();
         context = MainActivity.this;
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-//        OpenAnimata();
+        OpenAnimata();
 //        initCustomTimePicker();
         verifyStoragePermissions(MainActivity.this);
 //        StaggeredGridLayoutManager mLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
 //        recyclerView.setLayoutManager(mLayoutManager);
 
+        InitNew();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.updateDeviceName);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setNestedScrollingEnabled(false);
         adapter = new MainAdapter(mData);
         historicalPicturesRv.setLayoutManager(new LinearLayoutManager(this));
         historicalPicturesRv.setAdapter(adapter);
+        ReloadView();
+//        EditText UpdateEdit = (EditText) findViewById(R.id.input_deviceName);
+//        UpdateEdit.setBackgroundColor(Color.argb(255, 0, 255, 0));
         try {
             OkHttpVersionRequst();
 //            isUIProcess();
@@ -218,17 +252,19 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "检查版本更新时错误", Toast.LENGTH_SHORT).show();
         }
 
+
         // Start Timer Just Get Tamp Hum Data
-        Timer NowTimer = new Timer();
-        NowTimer.schedule(ViewTask, 1000, 1000);
+//        Timer NowTimer = new Timer();
+//        NowTimer.schedule(ViewTask, 1000, 1000);
         Timer Scroll = new Timer();
         Scroll.schedule(ScroolView, 200, 200);
-        Timer DeviceNames = new Timer();
-        DeviceNames.schedule(DeviceTimerTask, 2000, 2000);
-        MainBean mainBean = new MainBean();
-        AppVersion appVersion = new AppVersion();
-        NetUtil netWork = new NetUtil();
-        DeviceName deviceName = new DeviceName();
+
+        Timer test = new Timer();
+        test.schedule(Adapter_item, 1000, 1000);
+//        Timer DeviceNames = new Timer();
+//        DeviceNames.schedule(DeviceTimerTask, 2000, 2000);
+
+
 //        try {
 //            if (MainBean.Instance.id!=null && MainBean.Instance.id!=""){
 //                TimerTask_GetNewDeviceName();
@@ -236,6 +272,15 @@ public class MainActivity extends AppCompatActivity {
 //        }catch (Exception exception){
 //            MyErrorLog.e("初始化获取名称错误","获取设备名称错误");
 //        }
+        ImageView historical_data = (ImageView) findViewById(R.id.historical_data);
+        historical_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initTimePicker();
+                pvTime.show();
+            }
+        });
+
         TextView temBut = (TextView) findViewById(R.id.TextTemBut);
         temBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,21 +299,49 @@ public class MainActivity extends AppCompatActivity {
         UpdateDeviceName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    if (MainBean.Instance.id != null && MainBean.Instance.id != "") {
-                        EditText device_TextNames = (EditText) findViewById(R.id.DeviceInfo);
-                        dialog_edit.normalDialog(MainActivity.this, device_TextNames);
-
-                    }
-                } catch (Exception exception) {
-                    MyErrorLog.e("更改设备名称错误", exception.toString());
-                }
+//                try {
+//                    if (MainBean.Instance.id != null && MainBean.Instance.id != "") {
+//                        String GetDeviceNameValue = null;
+//
+//                        //updatetest
+//                        EditText device_updatetest = (EditText) findViewById(R.id.updatetest);
+//                        TextView device_count = (TextView) findViewById(R.id.devicecount);
+//                        TextView device_data = (TextView) findViewById(R.id.devicedata);
+//                        if (multideviceForDeviceNameList.size() > 0) {
+//                            for (int i = 0; i < multideviceForDeviceNameList.size(); i++) {
+//                                if (!StrList.contains(multideviceForDeviceNameList.get(i).name)) {
+//                                    StrList.add(multideviceForDeviceNameList.get(i).name);
+////                                    GetDeviceNameValue = GetDeviceNameValue + "|" + multideviceForDeviceNameList.get(i).name;
+//                                }
+//                            }
+//                        }
+//                        for (int i = 0; i < StrList.size(); i++) {
+//                            GetDeviceNameValue = "|" + StrList.get(i);
+//                        }
+//                        device_data.setText(GetDeviceNameValue);
+//                        device_count.setText(StrList.size() + "");
+//                        EditText device_TextNames = (EditText) findViewById(R.id.DeviceInfo);
+//                        dialog_edit.normalDialog(MainActivity.this, device_TextNames, MainBean.Instance.id);
+//                    }
+//                } catch (Exception exception) {
+//                    MyErrorLog.e("更改设备名称错误", exception.toString());
+//                }
             }
         });
+        ImageView Realod = (ImageView) findViewById(R.id.reloadView);
+        Realod.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MyErrorLog.d("Reload", "MainActivity Reload");
+                startActivity(new Intent(MainActivity.this, reload_view.class));
+            }
+        });
+
         ImageView imgdate = (ImageView) findViewById(R.id.main_date);
         imgdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 OpenExcel();
             }
         });
@@ -285,18 +358,26 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(runnable, TIME); // 开启定时器更新UI
     }
 
-//    private void OpenAnimata() {
-//        MainActivity.this.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                setContentView(R.layout.activity_main);
-//                String indicator = getIntent().getStringExtra("game");
-//                avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
-//                avi.setIndicator(indicator);
-//                avi.hide();
-//            }
-//        });
-//    }
+    private void OpenAnimata() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+//                    setContentView(R.layout.activity_main);
+//                    String indicator = getIntent().getStringExtra("game");
+//                    avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
+//                    avi.setIndicator(indicator);
+//                    avi.hide();
+
+
+                    TextView dalog = (TextView) findViewById(R.id.dalog);
+                    dalog.setVisibility(View.INVISIBLE);
+                } catch (Exception exception) {
+                    MyErrorLog.e("初始化加载动画效果错误", exception);
+                }
+            }
+        }).start();
+    }
 
     //    private void Index(){
 //        if (mData!=null){
@@ -321,9 +402,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public MainActivity(){
+    public MainActivity() {
         MainActivity.Instance = this;
     }
+
     protected void onStop() {
         handler.removeCallbacks(runnable);//停止计时器
         Log.d(TAG, "Enter onStop");
@@ -363,8 +445,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (!mSerial.enumerate()) {
-
-                Toast.makeText(this, "no more devices found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "没有接收到有效设备信息，请刷新", Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 Log.d(TAG, "onResume:enumerate succeeded!");
@@ -386,7 +467,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Enter  openUsbSerial");
 
         if (mSerial == null) {
-
             Log.d(TAG, "No mSerial");
             return;
 
@@ -419,24 +499,30 @@ public class MainActivity extends AppCompatActivity {
                 if (!mSerial.PL2303Device_IsHasPermission()) {
                     Toast.makeText(this, "cannot open, maybe no permission", Toast.LENGTH_SHORT).show();
                 }
-
                 if (mSerial.PL2303Device_IsHasPermission() && (!mSerial.PL2303Device_IsSupportChip())) {
                     Toast.makeText(this, "cannot open, maybe this chip has no support, please use PL2303HXD / RA / EA chip.", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "cannot open, maybe this chip has no support, please use PL2303HXD / RA / EA chip.");
+                    MyErrorLog.d(TAG, "cannot open, maybe this chip has no support, please use PL2303HXD / RA / EA chip.");
                 }
             } else {
                 Toast.makeText(this, "connected : OK", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "connected : OK");
-                Log.d(TAG, "Exit  openUsbSerial");
-
-
+                MyErrorLog.d(TAG, "connected : OK");
+                MyErrorLog.d(TAG, "Exit  openUsbSerial");
+                Handler handler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        //要做的事情
+                        readDataFromSerial();
+                        handler.postDelayed(this, 1000);
+                    }
+                };
+                handler.postDelayed(runnable, 1000);
             }
         }//isConnected
         else {
             Toast.makeText(this, "Connected failed, Please plug in PL2303 cable again!", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "connected failed, Please plug in PL2303 cable again!");
-
-
+            MyErrorLog.d(TAG, "connected failed, Please plug in PL2303 cable again!");
         }
     }//openUsbSerial
 
@@ -468,26 +554,72 @@ public class MainActivity extends AppCompatActivity {
         decoder.Decode(rbuf, len);
     }//readDataFromSerial
 
+    public List<Multidevice> multidevices = new ArrayList<>();
+    private List<MultideviceForDeviceName> multideviceForDeviceNameList = new ArrayList<>();
+    private List<String> temporary_Str = new ArrayList<>();
 
     /**
-     * 接收消息按钮状态
+     * 接收消息按钮状态   /初始值
      *
      * @param msg
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(SwitchStatusEvent msg) {
-        id = msg.getDepartId();
-        capacitance = msg.getDepartCapacitance();
-        time = msg.getDepartTime();
-        temperature = msg.getDepartTemperature();
-        List<MainBean> list = new ArrayList<>();
-        MainBean device = new MainBean();
-        device.setId(id);//设备id
-        device.setTiem(time);//时间
-        device.setCapacitance(capacitance);
-        device.setTemperature(temperature);
-        list.add(device);
-        adapter.addData(list);
+//        rwl.writeLock().lock();
+        try {
+//        TextView devicename = (TextView) findViewById(R.id.Device_1);
+            if (!temporary_Str.contains(msg.getDepartId())) {
+                temporary_Str.add(msg.getDepartId());
+                Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
+                multidevices.add(multidevice);
+                MyErrorLog.e("正常操作", "Success" + multidevices.size());
+
+//                if (temporary_Str.size() >= 2) {
+//                    MyErrorLog.e("初始赋值", "111");
+//                    Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
+//                    multidevices.add(multidevice);
+//                } else {
+//                    MyErrorLog.e("初始赋值", "222");
+//                    if (temporary_Str.size() > 3 || multidevices.size() >= 3) {
+//                        multidevices.clear();
+//                    } else {
+//                        Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
+//                        multidevices.add(multidevice);
+//                    }
+//                }
+            } else {
+                MyErrorLog.e("初始赋值", "333");
+//                multidevices.clear();
+//                rwl.writeLock().lock();
+                for (int i = 0; i < multidevices.size(); i++) {
+                    MyErrorLog.e(multidevices.get(i).id + "----" + i, msg.getDepartId());
+                    if (multidevices.get(i).id.equals(msg.getDepartId())) {
+                        MyErrorLog.e("循环删除 第" + i, multidevices.get(i));
+                        multidevices.remove(multidevices.get(i));
+                    }
+                }
+//                rwl.writeLock().unlock();
+                id = msg.getDepartId();
+                Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
+                multidevices.add(multidevice);
+            }
+            capacitance = msg.getDepartCapacitance();
+            time = msg.getDepartTime();
+            temperature = msg.getDepartTemperature();
+            List<MainBean> list = new ArrayList<>();
+            MainBean device = new MainBean();
+            device.setId(id);//设备id
+            device.setTiem(time);//时间
+            device.setCapacitance(capacitance);
+            device.setTemperature(temperature);
+            list.add(device);
+            adapter.addData(list);
+            MyErrorLog.e("重复加载数据", id + ":" + capacitance + ":" + temperature + ":" + time);
+        } catch (Exception exception) {
+            MyErrorLog.e("消息回调错误", exception);
+        } finally {
+//            rwl.writeLock().unlock();
+        }
     }
 
 
@@ -506,6 +638,7 @@ public class MainActivity extends AppCompatActivity {
 //            case R.id.main_resistance:
 //                break;
             case R.id.read_data://读取数据
+
                 Handler handler = new Handler();
                 Runnable runnable = new Runnable() {
                     @Override
@@ -543,7 +676,7 @@ public class MainActivity extends AppCompatActivity {
                 .setDate(selectedDate)//设置默认选择时间
                 .setRangDate(startDate, selectedDate)//设置开始时间  和结束时间
                 //添加自定义布局的回调方法
-                .setContentTextSize(18)
+                .setContentTextSize(14)
                 .setTitleText("选择开始时间")//标题
                 .setType(new boolean[]{true, true, true, false, false, false})//显示年月日时分秒 需要显示true
                 .setLabel("年", "月", "日", "时", "分", "秒")
@@ -600,9 +733,19 @@ public class MainActivity extends AppCompatActivity {
     TimerTask ViewTask = new TimerTask() {
         @Override
         public void run() {
-            SxView();
+            ThreadTask();
         }
     };
+
+    private void ThreadTask() {
+        scheduledExecutorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                SxView();
+            }
+        }, 1, TimeUnit.SECONDS);
+    }
+
     TimerTask ScroolView = new TimerTask() {
         @Override
         public void run() {
@@ -718,210 +861,282 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_EXTERNAL_STORAGE);
         }
     }
+    private void ViewTst(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                TextView Ts = (TextView) findViewById(R.id.dalog);
+                Ts.setVisibility(View.VISIBLE);
+            }
+        }).start();
+
+    }
 
     private void OpenExcel() {
-        try {
-            Time time = new Time("GMT+8");
-            time.setToNow();
-            int year = time.year;
-            int month = time.month;
-            int day = time.monthDay;
-            int minute = time.minute;
-            int hour = time.hour;
-            int sec = time.second;
-            if (month == 0) {
-                month = 1;
-            } else {
-                month = month + 1;
-            }
-            new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                try {
+                    Time time = new Time("GMT+8");
+                    time.setToNow();
+                    int year = time.year;
+                    int month = time.month;
+                    int day = time.monthDay;
+                    int minute = time.minute;
+                    int hour = time.hour;
+                    int sec = time.second;
                     if (month == 0) {
                         month = 1;
+                    } else {
+                        month = month + 1;
                     }
-                    List<ValueUtil> valueUtilList = new ArrayList<>();
-                    String data = String.format("%d-%d-%d", year, month + 1, dayOfMonth);//格式化日期
-                    String OutFileName = data + "ClassExeLogs.log";
-                    OutFileName.replace(" ", "");
-                    MyErrorLog.d("File Name:", OutFileName);
-                    File dir = Environment.getExternalStorageDirectory();
-                    File dirs = new File(dir.getPath() + "/LocalAppLogs/log/" + OutFileName + "");
-                    MyErrorLog.d("File Path", dirs.getPath());
-                    if (dirs.exists()) {
-                        MyErrorLog.e("存在", "文件存在");
-                        File file = new File(Environment.getExternalStorageDirectory(),
-                                "LocalAppLogs/log/Export/" + data + ".xls");
-                        if (!file.exists()) {
-                            FileInputStream fileInputStream = null;
-                            try {
-                                // 1.打开文件
-                                fileInputStream = new FileInputStream(dirs);
-                                // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
-                                BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
-                                String line = null;
-                                StringBuilder builder = new StringBuilder();
-                                while ((line = reader.readLine()) != null) {
-                                    builder.append(line);
+
+                    new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                            ViewTst();
+                            if (month == 0) {
+                                month = 1;
+                            }
+                            List<ValueUtil> valueUtilList = new ArrayList<>();
+                            String data = String.format("%d-%d-%d", year, month + 1, dayOfMonth);//格式化日期
+                            String OutFileName = data + "ClassExeLogs.log";
+                            OutFileName.replace(" ", "");
+                            MyErrorLog.d("File Name:", OutFileName);
+                            File dir = Environment.getExternalStorageDirectory();
+                            File dirs = new File(dir.getPath() + "/LocalAppLogs/log/" + OutFileName + "");
+                            MyErrorLog.d("File Path", dirs.getPath());
+                            if (dirs.exists()) {
+                                MyErrorLog.e("存在", "文件存在");
+                                File file = new File(Environment.getExternalStorageDirectory(),
+                                        "LocalAppLogs/log/Export/" + data + ".xls");
+                                if (!file.exists()) {
+                                    FileInputStream fileInputStream = null;
                                     try {
-                                        String DataType = null;
-                                        String DataUnit = null;
-                                        String DataValues = null;
-                                        String CutIndexOF_1 = line.replace(" ", "");
-                                        String compare = CutIndexOF_1.substring(CutIndexOF_1.indexOf("设备号"), CutIndexOF_1.length());
-                                        String CutDevice = compare.replace("设备号:", "设备号");
-                                        // 设备号
-                                        String CutIndexOF_2 = CutDevice.substring(CutDevice.indexOf("设备号") + 3, CutDevice.indexOf(":"));
+                                        // 1.打开文件
+                                        fileInputStream = new FileInputStream(dirs);
+                                        // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
+                                        BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+                                        String line = null;
+                                        StringBuilder builder = new StringBuilder();
+                                        ExecutorService executorService = Executors.newFixedThreadPool(5);
+                                        while ((line = reader.readLine()) != null) {
+                                            String finalLine = line;
+                                            Runnable syncRunnable = new Runnable() {
+                                                @Override
+                                                public void run() {
+//                                            MyErrorLog.e("线程:", Thread.currentThread().getName());
+                                                    builder.append(finalLine);
+                                                    try {
+                                                        String DataType = null;
+                                                        String DataUnit = null;
+                                                        String DataValues = null;
+                                                        String CutIndexOF_1 = finalLine.replace(" ", "");
+                                                        String compare = CutIndexOF_1.substring(CutIndexOF_1.indexOf("设备号"), CutIndexOF_1.length());
+                                                        String CutDevice = compare.replace("设备号:", "设备号");
+                                                        // 设备号
+                                                        String CutIndexOF_2 = CutDevice.substring(CutDevice.indexOf("设备号") + 3, CutDevice.indexOf(":"));
 
-                                        // 数据
-                                        String CutIndexOF_3 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:", "数据");
-                                        String DataValue = CutIndexOF_3.substring(CutIndexOF_3.indexOf("数据") + 2, CutIndexOF_3.indexOf(":"));
-                                        Pattern pattern = Pattern.compile("\t|\r|\n|\\s*");
-                                        Matcher matcher = pattern.matcher(DataValue);
-                                        String dest = matcher.replaceAll("");
-                                        String CutAuio = dest.replace("AUTO", "");
-                                        String Now_ = CutAuio.replace("+", "");
-                                        String Now__ = Now_.replace(" ", "");
-                                        String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
-                                        GetNOWVALUE.replace("-", "");
-                                        if (GetNOWVALUE.contains("DC")) {
-                                            GetNOWVALUE.replace("DC", "");
-                                            DataType = "DC";
-                                            if (GetNOWVALUE.contains("ERR")) {
-                                                GetNOWVALUE.replace("ERR", "");
-                                                DataUnit = GetNOWVALUE;
-                                            }
-                                        } else if (GetNOWVALUE.contains("AC")) {
-                                            GetNOWVALUE.replace("AC", "");
-                                            DataType = "AC";
-                                            if (GetNOWVALUE.contains("ERR")) {
-                                                GetNOWVALUE.replace("ERR", "");
-                                                DataUnit = "ERR";
-                                            }
-                                        } else if (GetNOWVALUE.contains("Hz")) {
-                                            DataType = "频率";
-                                        } else if (GetNOWVALUE.contains("ERR") || GetNOWVALUE.contains("-ERR") || GetNOWVALUE.contains("?") || GetNOWVALUE.contains(".") || GetNOWVALUE.contains(":")) {
-                                            DataValues = "ERR";
-                                            GetNOWVALUE.replace("ERR", "");
-                                            GetNOWVALUE.replace("-ERR", "");
-                                            GetNOWVALUE.replace("?", "");
-                                            GetNOWVALUE.replace(".", "");
-                                            GetNOWVALUE.replace(":", "");
-                                        }
+                                                        // 数据
+                                                        String CutIndexOF_3 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:", "数据");
+                                                        String DataValue = CutIndexOF_3.substring(CutIndexOF_3.indexOf("数据") + 2, CutIndexOF_3.indexOf(":"));
+                                                        Pattern pattern = Pattern.compile("\t|\r|\n|\\s*");
+                                                        Matcher matcher = pattern.matcher(DataValue);
+                                                        String dest = matcher.replaceAll("");
+                                                        String CutAuio = dest.replace("AUTO", "");
+                                                        String Now_ = CutAuio.replace("+", "");
+                                                        String Now__ = Now_.replace(" ", "");
+                                                        String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
+                                                        GetNOWVALUE.replace("-", "");
+                                                        if (GetNOWVALUE.contains("Ω")) {
+                                                            DataType = "电阻";
+                                                        } else if (GetNOWVALUE.contains("Diode")) {
+                                                            DataType = "二极管";
+                                                        } else if (GetNOWVALUE.contains("DC")) {
+                                                            GetNOWVALUE.replace("DC", "");
+                                                            DataType = "DC";
+                                                            if (GetNOWVALUE.contains("ERR")) {
+                                                                GetNOWVALUE.replace("ERR", "");
+                                                                DataUnit = GetNOWVALUE;
+                                                            }
+                                                        } else if (GetNOWVALUE.contains("AC")) {
+                                                            GetNOWVALUE.replace("AC", "");
+                                                            DataType = "AC";
+                                                            if (GetNOWVALUE.contains("ERR")) {
+                                                                GetNOWVALUE.replace("ERR", "");
+                                                                DataUnit = "ERR";
+                                                            }
+                                                        } else if (GetNOWVALUE.contains("Hz")) {
+                                                            DataType = "频率";
+                                                        } else if (GetNOWVALUE.contains("ERR") || GetNOWVALUE.contains("-ERR") || GetNOWVALUE.contains("?") || GetNOWVALUE.contains(".") || GetNOWVALUE.contains(":")) {
+                                                            DataValues = "ERR";
+                                                            GetNOWVALUE = GetNOWVALUE.replace("ERR", "");
+                                                            GetNOWVALUE = GetNOWVALUE.replace("-ERR", "");
+//                                            GetNOWVALUE = GetNOWVALUE.replace("?", "");
+//                                            GetNOWVALUE = GetNOWVALUE.replace(":", "");
+                                                        }
 
-                                        if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("V")) {
-                                            DataUnit = "mV";
-                                        } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Q")) {
-                                            DataType = "MΩ";
-                                            DataUnit = "MΩ";
-                                        } else if (GetNOWVALUE.contains("Hz")) {
-                                            DataUnit = "Hz";
-                                        } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("A")) {
-                                            DataUnit = "uA";
-                                        } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("A")) {
-                                            DataUnit = "mA";
-                                        } else if (GetNOWVALUE.contains("A") && GetNOWVALUE.contains("V")) {
-                                            DataUnit = "V";
-                                        } else if (GetNOWVALUE.contains("A")) {
-                                            DataUnit = "A";
-                                        }
+                                                        if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("V")) {
+                                                            DataUnit = "mV";
+                                                        } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Q")) {
+                                                            DataType = "MΩ";
+                                                            DataUnit = "MΩ";
+                                                        } else if (GetNOWVALUE.contains("Hz")) {
+                                                            DataUnit = "Hz";
+                                                        } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("A")) {
+                                                            DataUnit = "uA";
+                                                        } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("A")) {
+                                                            DataUnit = "mA";
+                                                        } else if (GetNOWVALUE.contains("A") && GetNOWVALUE.contains("V")) {
+                                                            DataUnit = "V";
+                                                        } else if (GetNOWVALUE.contains("n") && GetNOWVALUE.contains("f")) {
+                                                            DataType = "电容";
+                                                            DataUnit = "nF";
+                                                        } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("f")) {
+                                                            DataType = "电容";
+                                                            DataUnit = "mF";
+                                                        } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("f")) {
+                                                            DataType = "电容";
+                                                            DataUnit = "uF";
+                                                        } else if (GetNOWVALUE.contains("f")) {
+                                                            DataType = "电容";
+                                                            DataUnit = "F";
+                                                        } else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")) {
+                                                            DataType = "电阻";
+                                                            DataUnit = "kΩ";
+                                                        } else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")) {
+                                                            DataType = "二极管";
+                                                            DataUnit = "V";
+                                                        } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Ω")) {
+                                                            DataType = "电阻";
+                                                            DataUnit = "MΩ";
+                                                        } else if (GetNOWVALUE.contains("Ω")) {
+                                                            DataType = "电阻";
+                                                            DataUnit = "Ω";
+                                                        } else if (GetNOWVALUE.contains("A")) {
+                                                            DataUnit = "A";
+                                                        }
+                                                        if (GetNOWVALUE.contains("ERRDC") || GetNOWVALUE.contains("ERRVC")) {
+                                                            DataValues = "ERR";
+                                                        }
 
-                                        if (GetNOWVALUE.contains("ERRDC") || GetNOWVALUE.contains("ERRVC")) {
-                                            DataValues = "ERR";
-                                        }
+                                                        if (GetNOWVALUE.contains("-ERR")) {
+                                                            GetNOWVALUE.replace("-ERR", "");
+                                                            DataUnit = GetNOWVALUE;
+                                                        }
+                                                        if (GetNOWVALUE.length() >= 4) {
+                                                            String Cut_Str = GetNOWVALUE.replace("-", "");
+                                                            String CutString = Cut_Str.substring(0, 5);
+                                                            if (CutString.contains("ERRDC") || CutString.contains("ERRVC")) {
+                                                                DataValues = "ERR";
+                                                            } else if (CutString.contains("?")) {
+                                                                DataValues = "ERR";
+                                                            } else {
+                                                                if (CutString.contains("ERRDC") || CutString.contains("ERRAC")) {
+                                                                    DataValues = "ERR";
+                                                                } else if (CutString.contains("?")) {
+                                                                    DataValues = "ERR";
+                                                                } else {
+                                                                    DataValues = CutString;
+                                                                }
+                                                            }
+                                                        }
 
-                                        if (GetNOWVALUE.contains("-ERR")) {
-                                            GetNOWVALUE.replace("-ERR", "");
-                                            DataUnit = GetNOWVALUE;
-                                        }
-                                        if (GetNOWVALUE.length() > 5) {
-                                            String Cut_Str = GetNOWVALUE.replace("-", "");
-                                            String CutString = Cut_Str.substring(0, 5);
-                                            if (CutString.contains("ERRDC") || CutString.contains("ERRVC")) {
-                                                DataValues = "ERR";
-                                            } else if (CutString.contains("?")) {
-                                                DataValues = "ERR";
-                                            } else {
-                                                if (CutString.contains("ERRDC") || CutString.contains("ERRAC")) {
-                                                    DataValues = "ERR";
-                                                } else if (CutString.contains("?")) {
-                                                    DataValues = "ERR";
-                                                } else {
-                                                    DataValues = CutString;
+                                                        String CutIndexOF_4 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + "", "");
+                                                        String CutIndexOF_5 = CutIndexOF_4.replace(":温度:", "温度");
+                                                        // 温度
+                                                        String DataTemp = CutIndexOF_5.substring(CutIndexOF_5.indexOf("温度") + 2, CutIndexOF_5.indexOf(":"));
+
+                                                        String CutIndexOF_6 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + ":温度:" + DataTemp + "", "");
+                                                        String CutIndexOF_7 = CutIndexOF_6.replace(":湿度:", "湿度");
+                                                        // 湿度
+                                                        String DataHumi = CutIndexOF_7.substring(CutIndexOF_7.indexOf("湿度") + 2, CutIndexOF_7.indexOf(":"));
+
+                                                        String CutIndexOF_8 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + ":温度:" + DataTemp + ":湿度:" + DataHumi + "", "");
+                                                        String CutIndexOF_9 = CutIndexOF_8.replace(":记录时间:", "记录时间");
+                                                        // 记录时间
+                                                        String DataTime = CutIndexOF_9.substring(CutIndexOF_9.indexOf("记录时间") + 4, CutIndexOF_9.length());
+
+                                                        if (DataType == null) {
+                                                            DataType = "ERR";
+                                                        }
+                                                        if (DataValues == null) {
+                                                            DataValues = "ERR";
+                                                        }
+                                                        if (DataUnit == null) {
+                                                            DataUnit = "ERR";
+                                                        }
+                                                        if (DataUnit.contains("-ERRDC-m-V") || DataUnit.contains("-ERRAC-m-V")) {
+                                                            DataUnit = "mV";
+                                                        }
+                                                        ValueUtil valueUtil = new ValueUtil(CutIndexOF_2, DataValues, DataType, DataUnit, DataTemp, DataHumi, DataTime);
+                                                        valueUtilList.add(valueUtil);
+                                                    } catch (Exception exception) {
+                                                        OpenAnimata();
+                                                        MyErrorLog.e("写入列表错误", "错误信息:" + exception);
+                                                    }
                                                 }
+                                            };
+                                            executorService.execute(syncRunnable);
+                                        }
+                                        String[] title = {"设备号", "数据类型", "数据值", "单位", "温度", "湿度", "时间"};
+                                        String fileName = "" + data + ".xls";
+                                        File dir1 = Environment.getExternalStorageDirectory();
+                                        String path = dir1.getPath() + "/";
+                                        File dirs1 = new File(path + "LocalAppLogs/log/Export/" + fileName + "");
+                                        ExcelUtil.initExcel(fileName, "数据记录", title);
+                                        ExcelUtil.writeObjListToExcel(valueUtilList, dirs1.getPath(), MainActivity.this);
+                                    } catch (Exception e) {
+                                        MyErrorLog.e("Now Date", "File of found" + e);
+                                        OpenAnimata();
+                                        e.printStackTrace();
+                                        AlertDialog alertDialog1 = new AlertDialog.Builder(MainActivity.this)
+                                                .setTitle("" + data + " 相关数据信息获取错误")//标题
+                                                .setMessage(e.toString())//内容
+                                                .setIcon(R.drawable.error_data)//图标
+                                                .create();
+                                        alertDialog1.show();
+                                    } finally {
+                                        if (fileInputStream != null) {
+                                            try {
+                                                fileInputStream.close();
+                                                OpenAnimata();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
                                             }
                                         }
-                                        String CutIndexOF_4 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + "", "");
-                                        String CutIndexOF_5 = CutIndexOF_4.replace(":温度:", "温度");
-                                        // 温度
-                                        String DataTemp = CutIndexOF_5.substring(CutIndexOF_5.indexOf("温度") + 2, CutIndexOF_5.indexOf(":"));
-
-                                        String CutIndexOF_6 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + ":温度:" + DataTemp + "", "");
-                                        String CutIndexOF_7 = CutIndexOF_6.replace(":湿度:", "湿度");
-                                        // 湿度
-                                        String DataHumi = CutIndexOF_7.substring(CutIndexOF_7.indexOf("湿度") + 2, CutIndexOF_7.indexOf(":"));
-
-                                        String CutIndexOF_8 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + ":温度:" + DataTemp + ":湿度:" + DataHumi + "", "");
-                                        String CutIndexOF_9 = CutIndexOF_8.replace(":记录时间:", "记录时间");
-                                        // 记录时间
-                                        String DataTime = CutIndexOF_9.substring(CutIndexOF_9.indexOf("记录时间") + 4, CutIndexOF_9.length());
-
-                                        if (DataType == null) {
-                                            DataType = "ERR";
-                                        }
-                                        if (DataValues == null) {
-                                            DataValues = "ERR";
-                                        }
-                                        if (DataUnit == null) {
-                                            DataUnit = "ERR";
-                                        }
-                                        if (DataUnit.contains("-ERRDC-m-V") || DataUnit.contains("-ERRAC-m-V")) {
-                                            DataUnit = "mV";
-                                        }
-                                        ValueUtil valueUtil = new ValueUtil(CutIndexOF_2, DataValues, DataType, DataUnit, DataTemp, DataHumi, DataTime);
-                                        valueUtilList.add(valueUtil);
-                                    } catch (Exception exception) {
-                                        MyErrorLog.e("写入列表错误", "错误信息:" + exception);
                                     }
+                                } else {
+//                            Toast.makeText(MainActivity.this, "该文件已存在", Toast.LENGTH_SHORT).show();
+                                    AlertDialog alertDialog1 = new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("该文件已存在")//标题
+                                            .setMessage("文件路径：" + file.getPath())
+                                            .setIcon(R.drawable.yes)//图标
+                                            .create();
+                                    alertDialog1.show();
                                 }
-                                String[] title = {"设备号", "数据类型", "数据值", "单位", "温度", "湿度", "时间"};
-                                String fileName = "" + data + ".xls";
-                                File dir1 = Environment.getExternalStorageDirectory();
-                                String path = dir1.getPath() + "/";
-                                File dirs1 = new File(path + "LocalAppLogs/log/Export/" + fileName + "");
-                                ExcelUtil.initExcel(fileName, "数据记录", title);
-                                ExcelUtil.writeObjListToExcel(valueUtilList, dirs1.getPath(), MainActivity.this);
-                            } catch (Exception e) {
-                                MyErrorLog.e("Now Date", "File of found" + e);
-                                e.printStackTrace();
+                            } else {
                                 AlertDialog alertDialog1 = new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle("" + data + " 相关数据信息获取错误")//标题
-                                        .setMessage(e.toString())//内容
-                                        .setIcon(R.drawable.tem)//图标
+                                        .setTitle("未找到有效数据源文件")//标题
+                                        .setMessage(data + "：未找到此日期有效数据")
+                                        .setIcon(R.drawable.notfile)//图标
                                         .create();
                                 alertDialog1.show();
-                            } finally {
-                                if (fileInputStream != null) {
-                                    try {
-                                        fileInputStream.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+//                        Toast.makeText(MainActivity.this, "该文件不存在", Toast.LENGTH_SHORT).show();
+                                MyErrorLog.e("File of found", "this path of found" + dirs.getPath());
                             }
-                        } else {
-                            Toast.makeText(MainActivity.this, "该文件已存在", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(MainActivity.this, "该文件不存在", Toast.LENGTH_SHORT).show();
-                        MyErrorLog.e("File of found", "this path of found" + dirs.getPath());
-                    }
 
+                        }
+                    }, year, month - 1, day).show();
+
+                } catch (Exception exception) {
+                    OpenAnimata();
+                    Log.d(TAG, "Time Error: " + exception);
                 }
-            }, year, month - 1, day).show();
-        } catch (Exception exception) {
-            Log.d(TAG, "Time Error: " + exception);
-        }
+                Looper.loop();
+            }
+        }).start();
     }
 
     private void SxView() {
@@ -1013,12 +1228,12 @@ public class MainActivity extends AppCompatActivity {
                             NowElectricity.setText("交流电流");
                         } else if (GetNOWVALUE.contains("n") && GetNOWVALUE.contains("f")) {
                             NowElectricity.setText("电容");
-                        }else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")){
+                        } else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")) {
                             NowElectricity.setText("二极管");
-                        }else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")) {
+                        } else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")) {
                             NowImgSum.setImageResource(R.mipmap.ic_resistance);
                             NowElectricity.setText("电阻");
-                        }else if (GetNOWVALUE.contains("Ω")) {
+                        } else if (GetNOWVALUE.contains("Ω")) {
                             NowImgSum.setImageResource(R.mipmap.ic_resistance);
                             NowElectricity.setText("电阻");
                         }
@@ -1119,7 +1334,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return pInfo;
     }
 
@@ -1277,7 +1491,7 @@ public class MainActivity extends AppCompatActivity {
                 //"http://download.talkdoo.com/iVRealFTPTest/OVMClass_Level2_U4_Android/game/Win64/bin/iVRealEdc-armv7.apk"
                 final String url = Url;
                 final long startTime = System.currentTimeMillis();
-                MyLog.i("DOWNLOAD", "startTime=" + startTime);
+                MyErrorLog.i("DOWNLOAD", "startTime=" + startTime);
                 Request request = new Request.Builder().url(url).build();
                 new OkHttpClient().newCall(request).enqueue(new Callback() {
                     @Override
@@ -1320,7 +1534,7 @@ public class MainActivity extends AppCompatActivity {
         List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
         String mainProcessName = getPackageName();
         int myPid = android.os.Process.myPid();
-        MyLog.e("Process", "进程 " + mainProcessName + "------PID" + myPid);
+        MyErrorLog.e("Process", "进程 " + mainProcessName + "------PID" + myPid);
         for (ActivityManager.RunningAppProcessInfo info : processInfos) {
             if (info.pid == myPid && mainProcessName.equals(info.processName)) {
                 return true;
@@ -1334,7 +1548,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             try {
                 if (MainBean.Instance.id != null && MainBean.Instance.id != "") {
-                    TimerTask_GetNewDeviceName();
+                    TimerTask_GetNewDeviceName("");
                 }
             } catch (Exception ex) {
                 MyErrorLog.e("DeviceTimerTask Error ", ex);
@@ -1342,57 +1556,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void TimerTask_GetNewDeviceName() {
-        try {
-            File dir = Environment.getExternalStorageDirectory();
-            File dirs = new File(dir.getPath() + "/LocalAppLogs/log/Device/Device.log");
-            if (dirs.exists()) {
-                FileInputStream fileInputStream = null;
-                try {
-                    // 1.打开文件
-                    fileInputStream = new FileInputStream(dirs);
-                    // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
-                    String line = null;
-                    StringBuilder builder = new StringBuilder();
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line);
-                        if (line.contains(MainBean.Instance.id)) {
-                            String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
-                            String Cutins = Cut_IndexOF.replace(":", "");
-                            DeviceName.Instance.setDeviceName(Cutins);
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    MyErrorLog.e("适配器错误:Error", "info:" + e);
-                } finally {
-                    if (fileInputStream != null) {
-                        try {
-                            fileInputStream.close();
-                        } catch (IOException e) {
-                            MyErrorLog.e("适配器错误:Error", "info:" + e);
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else {
-                MyErrorLog.e("Device Local File Not Found:", "该文件不存在文件不存在");
-            }
-        } catch (Exception exception) {
-            MyErrorLog.e("Red Device Logs Error", "info : " + exception);
-        }
-    }
-
-    public void NewTimerTask_GetNewDeviceName(String str) {
+    public String TimerTask_GetNewDeviceName(String id) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    int sum = 0;
-                    EditText editText=(EditText) findViewById(R.id.DeviceInfo);
-                    List<DeviceSumStr> deviceSumStrs = new ArrayList<>();
+                    NewDeviceName = null;
                     File dir = Environment.getExternalStorageDirectory();
                     File dirs = new File(dir.getPath() + "/LocalAppLogs/log/Device/Device.log");
                     if (dirs.exists()) {
@@ -1404,35 +1573,19 @@ public class MainActivity extends AppCompatActivity {
                             BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
                             String line = null;
                             StringBuilder builder = new StringBuilder();
-
                             while ((line = reader.readLine()) != null) {
-                                if (line.contains(MainBean.Instance.id)) {
-                                    sum = sum + 1;
-                                    DeviceSumStr deviceSumStr = new DeviceSumStr(line);
-                                    deviceSumStrs.remove(deviceSumStr);
-                                } else {
-                                    DeviceSumStr deviceSumStr = new DeviceSumStr(line);
-                                    deviceSumStrs.add(deviceSumStr);
-                                }
-                                if (sum == 1) {
-                                    if (str!=null && str!=""){
-                                    LocalDeviceName.DeleteFileNow();
-                                    DeviceSumStr deviceSumStr = new DeviceSumStr(MainBean.Instance.id+":"+str);
-                                    deviceSumStrs.add(deviceSumStr);
-                                    builder.append(line);
-                                    }
-                                } else if (sum < 1){
+                                builder.append(line);
+//                        if (line.contains(MainBean.Instance.id)) {
+//                            String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
+//                            String Cutins = Cut_IndexOF.replace(":", "");
+//                            DeviceName.Instance.setDeviceName(Cutins);
+//                            return Cutins;
+//                        }
+                                if (line.contains(id)) {
                                     String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
                                     String Cutins = Cut_IndexOF.replace(":", "");
                                     DeviceName.Instance.setDeviceName(Cutins);
-                                    break;
-                                }
-                            }
-                            if (deviceSumStrs.size() >= 1&& sum >=1) {
-                                for (int i = 0; i < deviceSumStrs.size(); i++) {
-                                    if (DeviceName.Instance.DeviceName_ != null && DeviceName.Instance.DeviceName_ != "") {
-                                        LocalDeviceName.e("", deviceSumStrs.get(i).DeviceStr);
-                                    }
+                                    NewDeviceName = Cutins;
                                 }
                             }
                         } catch (Exception e) {
@@ -1448,11 +1601,461 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         }
+                    } else {
+                        MyErrorLog.e("Device Local File Not Found:", "该文件不存在文件不存在");
                     }
                 } catch (Exception exception) {
                     MyErrorLog.e("Red Device Logs Error", "info : " + exception);
                 }
             }
         }).start();
+        return NewDeviceName == null ? null : NewDeviceName;
+    }
+
+
+    public void NewTimerTask_GetNewDeviceName(String str, String id) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MyErrorLog.e("传输数据：", str + "------" + id);
+                    int sum = 0;
+                    EditText editText = (EditText) findViewById(R.id.DeviceInfo);
+                    List<DeviceSumStr> deviceSumStrs = new ArrayList<>();
+                    File dir = Environment.getExternalStorageDirectory();
+                    File dirs = new File(dir.getPath() + "/LocalAppLogs/log/Device/Device.log");
+                    if (dirs.exists()) {
+                        FileInputStream fileInputStream = null;
+                        try {
+                            // 1.打开文件
+                            fileInputStream = new FileInputStream(dirs);
+                            // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+                            String line = null;
+                            StringBuilder builder = new StringBuilder();
+                            while ((line = reader.readLine()) != null) {
+                                if (line.contains(id)) {
+                                    sum = sum + 1;
+                                    DeviceSumStr deviceSumStr = new DeviceSumStr(line);
+                                    deviceSumStrs.remove(deviceSumStr);
+                                } else {
+                                    DeviceSumStr deviceSumStr = new DeviceSumStr(line);
+                                    deviceSumStrs.add(deviceSumStr);
+                                }
+
+                            }
+
+                            if (sum == 1) {
+                                if (str != null && str != "") {
+                                    LocalDeviceName.DeleteFileNow();
+                                    DeviceSumStr deviceSumStr = new DeviceSumStr(id + ":" + str);
+                                    deviceSumStrs.add(deviceSumStr);
+                                    builder.append(line);
+                                }
+                            } else if (sum < 1) {
+                                LocalDeviceName.DeleteFileNow();
+                                DeviceSumStr deviceSumStr = new DeviceSumStr(id + ":" + str);
+                                deviceSumStrs.add(deviceSumStr);
+//                                String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
+//                                String Cutins = Cut_IndexOF.replace(":", "");
+//                                DeviceName.Instance.setDeviceName(Cutins);
+                            }
+                            if (deviceSumStrs.size() >= 1 && sum >= 1) {
+                                if (DeviceName.Instance.DeviceName_ != null || !dirs.exists()) {
+                                    for (int i = 0; i < deviceSumStrs.size(); i++) {
+                                        LocalDeviceName.e("", deviceSumStrs.get(i).DeviceStr);
+                                    }
+                                }
+                            }
+                            if (deviceSumStrs.size() >= 1) {
+                                LocalDeviceName.DeleteFileNow();
+                                if (DeviceName.Instance.DeviceName_ != null && DeviceName.Instance.DeviceName_ != "" || !dirs.exists()) {
+                                    for (int i = 0; i < deviceSumStrs.size(); i++) {
+                                        LocalDeviceName.e("", deviceSumStrs.get(i).DeviceStr);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            MyErrorLog.e("修改设备名称错误:", "info:" + e);
+                        } finally {
+                            if (fileInputStream != null) {
+                                try {
+                                    fileInputStream.close();
+                                } catch (IOException e) {
+                                    MyErrorLog.e("修改设备名称错误:", "info:" + e);
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception exception) {
+                    MyErrorLog.e("Red Device Logs Error", "info : " + exception);
+                }
+            }
+        }).start();
+    }
+
+    private void initTimePicker() {
+        Calendar selectedDate = Calendar.getInstance();
+        Calendar startDate = Calendar.getInstance();
+        startDate.set(1900, 1, 1);//起始时间
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(2099, 12, 31);//结束时间
+        pvTime = new TimePickerBuilder(MainActivity.this, new OnTimeSelectListener() {
+            @Override
+            public void onTimeSelect(Date date, View v) {
+                MyErrorLog.e("", getTimes(date));
+                File dir = Environment.getExternalStorageDirectory();
+                File dirs = new File(dir.getPath() + "/LocalAppLogs/log/" + historical_data_info + "ClassExeLogs.log");
+                if (dirs.exists()) {
+//                    avi.show();
+                    TextView dalog = (TextView) findViewById(R.id.dalog);
+                    dalog.setVisibility(View.VISIBLE);
+                    MyErrorLog.d("存在", "存在");
+                    ReadText(historical_data_info, getTimes(date));
+                    Intent Href = new Intent();
+                    Href.setClass(MainActivity.this, new_historical_data.class);
+                    startActivity(Href);
+                } else {
+                    MyErrorLog.d("不存在", "不存在");
+                    AlertDialog alertDialog1 = new AlertDialog.Builder(context)
+                            .setTitle("未知文件")//标题
+                            .setMessage("当前文件不存在 -> " + dirs.getName())//内容
+                            .setIcon(R.drawable.notfile)//图标
+                            .create();
+                    alertDialog1.show();
+                }
+            }
+        })
+                .setType(new boolean[]{true, true, true, true, true, false})
+                .setLabel(" 年", "月", "日", "时", "分", "")
+                .isCenterLabel(true)
+                .setDividerColor(Color.DKGRAY)
+                .setContentTextSize(16)
+                .setDate(selectedDate)
+                .setRangDate(startDate, endDate)
+                .setDecorView(null)
+                .build();
+    }
+
+    //格式化时间
+    private String getTimes(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-M-d");
+        historical_data_info = format1.format(date);
+        return format.format(date);
+    }
+
+    private void ReadText(String file_Name, String date) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File dir = Environment.getExternalStorageDirectory();
+                File dirs = new File(dir.getPath() + "/LocalAppLogs/log/" + file_Name + "ClassExeLogs.log");
+                if (dirs.exists()) {
+                    FileInputStream fileInputStream = null;
+                    try {
+                        // 1.打开文件
+                        fileInputStream = new FileInputStream(dirs);
+                        // 2.读操作 字节流（byte 10001） -----> 字符流（编码）ASCLL 流操作
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+                        String line = null;
+                        StringBuilder builder = new StringBuilder();
+//                        ExecutorService executorService = Executors.newFixedThreadPool(5);
+                        while ((line = reader.readLine()) != null) {
+                            String finalLine = line;
+//                            Runnable syncRunnable = new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    MyErrorLog.e("线程:", Thread.currentThread().getName());
+                            builder.append(finalLine);
+                            if (finalLine.contains(date)) {
+                                try {
+                                    String DataType = null;
+                                    String DataUnit = null;
+                                    String DataValues = null;
+                                    String CutIndexOF_1 = finalLine.replace(" ", "");
+                                    String compare = CutIndexOF_1.substring(CutIndexOF_1.indexOf("设备号"), CutIndexOF_1.length());
+                                    String CutDevice = compare.replace("设备号:", "设备号");
+                                    // 设备号
+                                    String CutIndexOF_2 = CutDevice.substring(CutDevice.indexOf("设备号") + 3, CutDevice.indexOf(":"));
+
+                                    // 数据
+                                    String CutIndexOF_3 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:", "数据");
+                                    String DataValue = CutIndexOF_3.substring(CutIndexOF_3.indexOf("数据") + 2, CutIndexOF_3.indexOf(":"));
+                                    Pattern pattern = Pattern.compile("\t|\r|\n|\\s*");
+                                    Matcher matcher = pattern.matcher(DataValue);
+                                    String dest = matcher.replaceAll("");
+                                    String CutAuio = dest.replace("AUTO", "");
+                                    String Now_ = CutAuio.replace("+", "");
+                                    String Now__ = Now_.replace(" ", "");
+                                    String GetNOWVALUE = Now__.substring(0, Now_.length() - 1);
+                                    GetNOWVALUE.replace("-", "");
+                                    if (GetNOWVALUE.contains("Ω")) {
+                                        DataType = "电阻";
+                                    } else if (GetNOWVALUE.contains("Diode")) {
+                                        DataType = "二极管";
+                                    } else if (GetNOWVALUE.contains("DC")) {
+                                        GetNOWVALUE.replace("DC", "");
+                                        DataType = "DC";
+                                        if (GetNOWVALUE.contains("ERR")) {
+                                            GetNOWVALUE.replace("ERR", "");
+                                            DataUnit = GetNOWVALUE;
+                                        }
+                                    } else if (GetNOWVALUE.contains("AC")) {
+                                        GetNOWVALUE.replace("AC", "");
+                                        DataType = "AC";
+                                        if (GetNOWVALUE.contains("ERR")) {
+                                            GetNOWVALUE.replace("ERR", "");
+                                            DataUnit = "ERR";
+                                        }
+                                    } else if (GetNOWVALUE.contains("Hz")) {
+                                        DataType = "频率";
+                                    } else if (GetNOWVALUE.contains("ERR") || GetNOWVALUE.contains("-ERR") || GetNOWVALUE.contains("?") || GetNOWVALUE.contains(".") || GetNOWVALUE.contains(":")) {
+                                        DataValues = "ERR";
+                                        GetNOWVALUE = GetNOWVALUE.replace("ERR", "");
+                                        GetNOWVALUE = GetNOWVALUE.replace("-ERR", "");
+                                    }
+
+                                    if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("V")) {
+                                        DataUnit = "mV";
+                                    } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Q")) {
+                                        DataType = "MΩ";
+                                        DataUnit = "MΩ";
+                                    } else if (GetNOWVALUE.contains("Hz")) {
+                                        DataUnit = "Hz";
+                                    } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("A")) {
+                                        DataUnit = "uA";
+                                    } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("A")) {
+                                        DataUnit = "mA";
+                                    } else if (GetNOWVALUE.contains("A") && GetNOWVALUE.contains("V")) {
+                                        DataUnit = "V";
+                                    } else if (GetNOWVALUE.contains("n") && GetNOWVALUE.contains("f")) {
+                                        DataType = "电容";
+                                        DataUnit = "nF";
+                                    } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("f")) {
+                                        DataType = "电容";
+                                        DataUnit = "mF";
+                                    } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("f")) {
+                                        DataType = "电容";
+                                        DataUnit = "uF";
+                                    } else if (GetNOWVALUE.contains("f")) {
+                                        DataType = "电容";
+                                        DataUnit = "F";
+                                    } else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")) {
+                                        DataType = "电阻";
+                                        DataUnit = "kΩ";
+                                    } else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")) {
+                                        DataType = "二极管";
+                                        DataUnit = "V";
+                                    } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Ω")) {
+                                        DataType = "电阻";
+                                        DataUnit = "MΩ";
+                                    } else if (GetNOWVALUE.contains("Ω")) {
+                                        DataType = "电阻";
+                                        DataUnit = "Ω";
+                                    } else if (GetNOWVALUE.contains("A")) {
+                                        DataUnit = "A";
+                                    }
+                                    if (GetNOWVALUE.contains("ERRDC") || GetNOWVALUE.contains("ERRVC")) {
+                                        DataValues = "ERR";
+                                    }
+
+                                    if (GetNOWVALUE.contains("-ERR")) {
+                                        GetNOWVALUE.replace("-ERR", "");
+                                        DataUnit = GetNOWVALUE;
+                                    }
+                                    if (GetNOWVALUE.length() >= 4) {
+                                        String Cut_Str = GetNOWVALUE.replace("-", "");
+                                        String CutString = Cut_Str.substring(0, 5);
+                                        if (CutString.contains("ERRDC") || CutString.contains("ERRVC")) {
+                                            DataValues = "ERR";
+                                        } else if (CutString.contains("?")) {
+                                            DataValues = "ERR";
+                                        } else {
+                                            if (CutString.contains("ERRDC") || CutString.contains("ERRAC")) {
+                                                DataValues = "ERR";
+                                            } else if (CutString.contains("?")) {
+                                                DataValues = "ERR";
+                                            } else {
+                                                DataValues = CutString;
+                                            }
+                                        }
+                                    }
+
+                                    String CutIndexOF_4 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + "", "");
+                                    String CutIndexOF_5 = CutIndexOF_4.replace(":温度:", "温度");
+                                    // 温度
+                                    String DataTemp = CutIndexOF_5.substring(CutIndexOF_5.indexOf("温度") + 2, CutIndexOF_5.indexOf(":"));
+
+                                    String CutIndexOF_6 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + ":温度:" + DataTemp + "", "");
+                                    String CutIndexOF_7 = CutIndexOF_6.replace(":湿度:", "湿度");
+                                    // 湿度
+                                    String DataHumi = CutIndexOF_7.substring(CutIndexOF_7.indexOf("湿度") + 2, CutIndexOF_7.indexOf(":"));
+
+                                    String CutIndexOF_8 = compare.replace("设备号:" + CutIndexOF_2 + ":数据:" + DataValue + ":温度:" + DataTemp + ":湿度:" + DataHumi + "", "");
+                                    String CutIndexOF_9 = CutIndexOF_8.replace(":记录时间:", "记录时间");
+                                    // 记录时间
+                                    String DataTime = CutIndexOF_9.substring(CutIndexOF_9.indexOf("记录时间") + 4, CutIndexOF_9.length());
+
+                                    if (DataType == null) {
+                                        DataType = "ERR";
+                                    }
+                                    if (DataValues == null) {
+                                        DataValues = "ERR";
+                                    }
+                                    if (DataUnit == null) {
+                                        DataUnit = "ERR";
+                                    }
+                                    if (DataUnit.contains("-ERRDC-m-V") || DataUnit.contains("-ERRAC-m-V")) {
+                                        DataUnit = "mV";
+                                    }
+                                    Historical_Data_Value historicalDataValue = new Historical_Data_Value(CutIndexOF_2, DataValues, DataType, DataUnit, DataTemp, DataHumi, DataTime);
+                                    historical_data_values.add(historicalDataValue);
+                                } catch (Exception exception) {
+                                    MyErrorLog.e("查询历史数据出错", "错误信息:" + exception);
+                                }
+                            }
+                        }
+//                            };
+//                            executorService.execute(syncRunnable);
+//                        }
+                    } catch (Exception e) {
+                        OpenAnimata();
+                        MyErrorLog.e("Now Date", "File of found" + e);
+                        e.printStackTrace();
+                    } finally {
+                        if (fileInputStream != null) {
+                            try {
+                                OpenAnimata();
+                                fileInputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            OpenAnimata();
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
+    // 获取修改设备名称
+    public String UpdateDeviceName() {
+        EditText UpdateName = (EditText) findViewById(R.id.input_deviceName);
+        String Pm = UpdateName.getText() == null ? null : UpdateName.getText().toString();
+        return Pm == null ? null : Pm;
+    }
+
+    // 清除输入框 值
+    public void DeelteDeviceNameValue() {
+        EditText UpdateName = (EditText) findViewById(R.id.input_deviceName);
+        UpdateName.setText(null);
+    }
+
+    // 获取输入框内容进行修改
+    public Boolean UpdateDeviceNamePublic(String id) {
+        Boolean jUSToK = false;
+        try {
+            EditText device_TextNames = (EditText) findViewById(R.id.DeviceInfo);
+            dialog_edit.normalDialog(this, device_TextNames, id);
+            jUSToK = true;
+        } catch (Exception exception) {
+            MyErrorLog.e("执行输入修改设备名称错误", exception);
+        }
+        return jUSToK;
+    }
+
+    public Boolean ToskInfo(Boolean Success) {
+        if (Success) {
+            AlertDialog alertDialog1 = new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("修改设备操作")//标题
+                    .setMessage("操作成功")
+                    .setIcon(R.drawable.success)//图标
+                    .create();
+            alertDialog1.show();
+//            Toast.makeText(MainActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+        } else {
+//            Toast.makeText(MainActivity.this, "修改失败!", Toast.LENGTH_SHORT).show();
+            AlertDialog alertDialog1 = new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("修改设备操作")//标题
+                    .setMessage("修改失败")
+                    .setIcon(R.drawable.notfound)//图标
+                    .create();
+            alertDialog1.show();
+        }
+        return Success;
+    }
+
+
+    public void SumView(List<Multidevice> data) {
+        date_compute.normalDialog(MainActivity.this, data);
+    }
+
+    private void InitNew() {
+        MainBean mainBean = new MainBean();
+        AppVersion appVersion = new AppVersion();
+        NetUtil netWork = new NetUtil();
+        DeviceName deviceName = new DeviceName();
+        Device_Info device_info = new Device_Info();
+    }
+
+    public void Success_OK(String str) {
+        try {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Looper.prepare();
+                    OpenAnimata();
+                    AlertDialog alertDialog1 = new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("导出Excel成功")//标题
+                            .setMessage("存放路径::" + str)
+                            .setIcon(R.drawable.success)//图标
+                            .create();
+                    alertDialog1.show();
+                    Looper.loop();
+                }
+            }).start();
+        } catch (Exception exception) {
+            MyErrorLog.e("AlertDialog Error", "" + exception);
+        }
+
+
+    }
+
+    TimerTask Adapter_item = new TimerTask() {
+        @Override
+        public void run() {
+            ReloadView();
+        }
+    };
+
+    private void ReloadView() {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                myRecy = (RecyclerView) findViewById(R.id.updateDeviceName);
+                myRecy.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                myRecy.setAdapter(new device_Three_Item(MainActivity.this, multidevices));
+            }
+        });
+//        if (multidevices.size() > 0) {
+//            Handler handler = new Handler();
+//            Runnable runnable = new Runnable() {
+//                @Override
+//                public void run() {
+//                    // TODO Auto-generated method stub
+//                    //要做的事情
+//                    myRecy = (RecyclerView) findViewById(R.id.updateDeviceName);
+//                    myRecy.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+//                    myRecy.setAdapter(new device_Three_Item(MainActivity.this, multidevices));
+//                    handler.postDelayed(this, 1000);
+//                }
+//            };
+//            handler.postDelayed(runnable, 1000);
+//        }
+//    }
     }
 }

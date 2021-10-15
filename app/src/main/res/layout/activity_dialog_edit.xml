@@ -8,5 +8,13 @@
         android:id="@+id/et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="修改名称"
         />
+<!--    <EditText-->
+<!--        android:id="@+id/es"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="修改后显示的名称"-->
+<!--        />-->
 </LinearLayout>

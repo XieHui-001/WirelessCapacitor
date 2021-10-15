@@ -1,8 +1,8 @@
 package com.example.wirelesscapacitor;
 
-public class ValueUtil {
-    public String DeviceID = null;
-    public String Value = null;
+public class Historical_Data_Value {
+    public String DeviceID;
+    public String Value;
 
     public String getType() {
         return type;
@@ -20,9 +20,9 @@ public class ValueUtil {
         this.unit = unit;
     }
 
-    public String type = null;
-    public String unit = null;
-    public  ValueUtil(String deviceID, String value,String type,String unit, String temp, String humi, String nowdate){
+    public String type;
+    public String unit;
+    public  Historical_Data_Value(String deviceID, String value,String type,String unit, String temp, String humi, String nowdate){
         this.DeviceID = deviceID;
         this.Value = value;
         this.Temp = temp;
@@ -71,7 +71,7 @@ public class ValueUtil {
         Nowdate = nowdate;
     }
 
-    public String Temp = null;
-    public String Humi = null;
-    public String Nowdate = null;
+    public String Temp;
+    public String Humi;
+    public String Nowdate;
 }

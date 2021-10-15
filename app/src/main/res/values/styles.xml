@@ -2,9 +2,17 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+<!--        <item name="android:windowBackground">@drawable/reload_2</item>  //闪屏页图片-->
+<!--        <item name="android:windowFullscreen">true</item>-->
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">false</item>&lt;!&ndash;显示虚拟按键，并腾出空间&ndash;&gt;-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="windowActionBar">false</item>
+        <!--//没有状态栏，即全屏-->
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -15,5 +23,16 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="ThemeSplash" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--//注意！！把背景设置成欢迎界面！！！-->
+        //@mipmap/ic_welcome
+        <item name="android:background">@drawable/index_2</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="windowActionBar">false</item>
+        <!--//没有状态栏，即全屏-->
+        <item name="windowNoTitle">true</item>
+    </style>
 
 </resources>

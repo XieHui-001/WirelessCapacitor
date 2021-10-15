@@ -10,7 +10,7 @@ import android.content.pm.ResolveInfo;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+//        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
 //            MyErrorLog.e("自启动了 ！！！！！","Success");
 //            Intent newIntent = new Intent(context, MainActivity.class);  // 要启动的Activity
 //            //1.如果自启动APP，参数为需要自动启动的应用包名
@@ -24,6 +24,6 @@ public class BootReceiver extends BroadcastReceiver {
             Intent i = new Intent(context, MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(i);
-        }
+//        }
     }
 }

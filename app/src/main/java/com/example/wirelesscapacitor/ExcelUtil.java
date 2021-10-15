@@ -76,7 +76,7 @@ public class ExcelUtil {
         WritableWorkbook workbook = null;
 
         try {
-            File file = new File( "/sdcard/LocalAppLogs/log/Export");
+            File file = new File("/sdcard/LocalAppLogs/log/Export");
             makeDir(file);
             File saveFile = new File(file, filePath);
             if (!saveFile.exists()) {
@@ -126,33 +126,46 @@ public class ExcelUtil {
                 Workbook workbook = Workbook.getWorkbook(in);
                 writebook = Workbook.createWorkbook(new File(fileName), workbook);
                 WritableSheet sheet = writebook.getSheet(0);
-                for (int j = 0; j < objList.size(); j ++) {
+                for (int j = 0; j < objList.size(); j++) {
                     ValueUtil projectBean = (ValueUtil) objList.get(j);
                     List<String> list = new ArrayList<>();
-                    list.add(projectBean.getDeviceID());
-                    list.add(projectBean.getType());
-                    list.add(projectBean.getValue());
-                    list.add(projectBean.getUnit());
-                    list.add(projectBean.getTemp());
-                    list.add(projectBean.getHumi());
-                    list.add(projectBean.getNowdate());
-                    for (int i = 0; i < list.size(); i++ ) {
-                        sheet.addCell(new Label(i, j+1, list.get(i), arial12format));
-                        if (list.get(i).length() <= 4) {
-                            //设置列宽
-                            sheet.setColumnView(i, list.get(i).length()+ 8);
-                        } else {
-                            //设置列宽
-                            sheet.setColumnView(i, list.get(i).length() +5);
+                    String DeviceID = null;
+                    try {
+                        if (projectBean != null) {
+                            DeviceID = projectBean.DeviceID.toString();
                         }
+                    } catch (Exception exception) {
+                        MyErrorLog.e("当前第:" + j, "条数据存在问题");
                     }
-                    //设置行高
-                    sheet.setRowView(j + 1, 350);
+
+                    if (DeviceID != null) {
+//                        String DeviceName = MainActivity.Instance.TimerTask_GetNewDeviceName(projectBean.getDeviceID());
+                        list.add(projectBean.getDeviceID());
+                        list.add(projectBean.getType());
+                        list.add(projectBean.getValue());
+                        list.add(projectBean.getUnit());
+                        list.add(projectBean.getTemp());
+                        list.add(projectBean.getHumi());
+                        list.add(projectBean.getNowdate());
+                        for (int i = 0; i < list.size(); i++) {
+                            sheet.addCell(new Label(i, j + 1, list.get(i), arial12format));
+                            if (list.get(i).length() <= 4) {
+                                //设置列宽
+                                sheet.setColumnView(i, list.get(i).length() + 8);
+                            } else {
+                                //设置列宽
+                                sheet.setColumnView(i, list.get(i).length() + 5);
+                            }
+                        }
+                        //设置行高
+                        sheet.setRowView(j + 1, 350);
+                    }
                 }
                 writebook.write();
-                Toast.makeText(c, "导出Excel成功,  存放路径:"+fileName+"", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(c, "导出Excel成功,  存放路径:"+fileName+"", Toast.LENGTH_SHORT).show();
+                MainActivity.Instance.Success_OK(fileName);
             } catch (Exception e) {
-                MyErrorLog.e("","");
+                MyErrorLog.e("Excel Util", "" + e);
                 e.printStackTrace();
             } finally {
                 if (writebook != null) {
@@ -161,7 +174,6 @@ public class ExcelUtil {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
                 if (in != null) {
                     try {
