@@ -106,7 +106,7 @@ import tw.com.prolific.driver.pl2303.PL2303Driver;
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.main_date)
-    ImageView mainDate;
+    LinearLayout mainDate;
     @BindView(R.id.main_current)
     LinearLayout mainCurrent;
     @BindView(R.id.main_voltage)
@@ -328,20 +328,20 @@ public class MainActivity extends AppCompatActivity {
 //                }
             }
         });
-        ImageView Realod = (ImageView) findViewById(R.id.reloadView);
+        LinearLayout Realod = (LinearLayout) findViewById(R.id.reloadView);
         Realod.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyErrorLog.d("Reload", "MainActivity Reload");
+                Toast.makeText(MainActivity.this, "正在重新载入中.....", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(MainActivity.this, reload_view.class));
             }
         });
 
-        ImageView imgdate = (ImageView) findViewById(R.id.main_date);
+        LinearLayout imgdate = (LinearLayout) findViewById(R.id.main_date);
         imgdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(MainActivity.this, "导出面板加载中....", Toast.LENGTH_SHORT).show();
                 OpenExcel();
             }
         });
@@ -861,7 +861,8 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_EXTERNAL_STORAGE);
         }
     }
-    private void ViewTst(){
+
+    private void ViewTst() {
         new Thread(new Runnable() {
             @Override
             public void run() {

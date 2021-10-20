@@ -206,9 +206,9 @@ public class device_Three_Item extends RecyclerView.Adapter<device_Three_Item.Li
                                     float MyValue_int = Float.parseFloat(MyValue);
                                     float MyValue_int_1 = Float.parseFloat(MyValue_1);
                                     // 1 - 2
-                                    float Count = MyValue_int + MyValue_int_1 / 2;
-                                    float QutCount = MyValue_int - Count / MyValue_int;
-                                    float QutCOunt_Two = MyValue_int_1 - Count / MyValue_int_1;
+                                    float Count = (MyValue_int + MyValue_int_1) / 2;
+                                    float QutCount = (MyValue_int - Count) / MyValue_int;
+                                    float QutCOunt_Two = (MyValue_int_1 - Count) / MyValue_int_1;
 
                                     DecimalFormat decimalFormat = new DecimalFormat(".00");
                                     String _QutCount = decimalFormat.format(QutCount * 100);
@@ -244,10 +244,10 @@ public class device_Three_Item extends RecyclerView.Adapter<device_Three_Item.Li
                                     float MyValue_int_1 = Float.parseFloat(MyValue_1);
                                     float MyValue_int_2 = Float.parseFloat(MyValue_2);
 
-                                    float SumValue = MyValue_int + MyValue_int_1 + MyValue_int_2 / 3;
-                                    float OneVlaue = MyValue_int - SumValue / MyValue_int;
-                                    float TwoValue = MyValue_int_1 - SumValue / MyValue_int_1;
-                                    float Thre = MyValue_int_2 - SumValue / MyValue_int_2;
+                                    float SumValue = (MyValue_int + MyValue_int_1 + MyValue_int_2) / 3;
+                                    float OneVlaue = (MyValue_int - SumValue) / MyValue_int;
+                                    float TwoValue = (MyValue_int_1 - SumValue) / MyValue_int_1;
+                                    float Thre = (MyValue_int_2 - SumValue) / MyValue_int_2;
 
 
                                     DecimalFormat decimalFormat = new DecimalFormat(".00");
