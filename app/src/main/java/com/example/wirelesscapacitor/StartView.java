@@ -1,13 +1,17 @@
 package com.example.wirelesscapacitor;
 
+import static android.view.KeyEvent.KEYCODE_BACK;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class StartView extends AppCompatActivity {
 
@@ -42,5 +46,13 @@ public class StartView extends AppCompatActivity {
             }
         });
         return null;
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KEYCODE_BACK) {
+            return true;
+        }
+        return true;
     }
 }

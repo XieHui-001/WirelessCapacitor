@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.wirelesscapacitor.moudle.adapter.Historical_Item;
@@ -52,13 +53,14 @@ public class new_historical_data extends AppCompatActivity {
         });
         TextView textView=(TextView) findViewById(R.id.historical_datatime);
         textView.setText("当前数据日期:"+ MainActivity.historical_data_info);
-        ImageView back =(ImageView) findViewById(R.id.Kback);
+        LinearLayout back =(LinearLayout) findViewById(R.id.historical_date);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent Href = new Intent();
                 Href.setClass(new_historical_data.this, MainActivity.class);
                 startActivity(Href);
+                finish();
             }
         });
     }

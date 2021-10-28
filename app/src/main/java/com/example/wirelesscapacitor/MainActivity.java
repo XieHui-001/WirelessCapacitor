@@ -1,5 +1,7 @@
 package com.example.wirelesscapacitor;
 
+import static android.view.KeyEvent.KEYCODE_BACK;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -23,6 +25,7 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -1277,7 +1280,7 @@ public class MainActivity extends AppCompatActivity {
                         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
                         RequestBody body = RequestBody.create(mediaType, "name=在线监测安卓&department=南电科技&plat=android");
                         Request request = new Request.Builder()
-                                .url("http://www.cqset.com:8081/api/v2/version/check_version?name=在线监测安卓&department=南电科技&plat=android")
+                                .url("http://version.cqset.com/api/sys/version/check_version?name=在线监测安卓&department=南电科技&plat=android")
                                 .method("POST", body)
                                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
                                 .build();
@@ -2058,5 +2061,14 @@ public class MainActivity extends AppCompatActivity {
 //            handler.postDelayed(runnable, 1000);
 //        }
 //    }
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KEYCODE_BACK) {
+            Toast.makeText(MainActivity.this, "请使用Home返回", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return true;
     }
 }
