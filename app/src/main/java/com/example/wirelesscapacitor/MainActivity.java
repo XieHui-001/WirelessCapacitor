@@ -49,6 +49,7 @@ import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.example.wirelesscapacitor.moudle.adapter.MainAdapter;
+import com.example.wirelesscapacitor.moudle.adapter.NewItem;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.apache.log4j.chainsaw.Main;
@@ -214,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
     private ReadWriteLock rwl = new ReentrantReadWriteLock();
+    private List<MainBean> MAIN = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,8 +245,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setNestedScrollingEnabled(false);
         adapter = new MainAdapter(mData);
+        historicalPicturesRv.setHasFixedSize(true);
+        historicalPicturesRv.setNestedScrollingEnabled(false);
         historicalPicturesRv.setLayoutManager(new LinearLayoutManager(this));
         historicalPicturesRv.setAdapter(adapter);
+//        historicalPicturesRv.setAdapter(new NewItem(MainActivity.this, MAIN));
         ReloadView();
 //        EditText UpdateEdit = (EditText) findViewById(R.id.input_deviceName);
 //        UpdateEdit.setBackgroundColor(Color.argb(255, 0, 255, 0));
@@ -568,32 +573,15 @@ public class MainActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessage(SwitchStatusEvent msg) {
-//        rwl.writeLock().lock();
+        rwl.writeLock().lock();
         try {
-//        TextView devicename = (TextView) findViewById(R.id.Device_1);
             if (!temporary_Str.contains(msg.getDepartId())) {
                 temporary_Str.add(msg.getDepartId());
                 Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
                 multidevices.add(multidevice);
                 MyErrorLog.e("正常操作", "Success" + multidevices.size());
-
-//                if (temporary_Str.size() >= 2) {
-//                    MyErrorLog.e("初始赋值", "111");
-//                    Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
-//                    multidevices.add(multidevice);
-//                } else {
-//                    MyErrorLog.e("初始赋值", "222");
-//                    if (temporary_Str.size() > 3 || multidevices.size() >= 3) {
-//                        multidevices.clear();
-//                    } else {
-//                        Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
-//                        multidevices.add(multidevice);
-//                    }
-//                }
             } else {
                 MyErrorLog.e("初始赋值", "333");
-//                multidevices.clear();
-//                rwl.writeLock().lock();
                 for (int i = 0; i < multidevices.size(); i++) {
                     MyErrorLog.e(multidevices.get(i).id + "----" + i, msg.getDepartId());
                     if (multidevices.get(i).id.equals(msg.getDepartId())) {
@@ -601,7 +589,6 @@ public class MainActivity extends AppCompatActivity {
                         multidevices.remove(multidevices.get(i));
                     }
                 }
-//                rwl.writeLock().unlock();
                 id = msg.getDepartId();
                 Multidevice multidevice = new Multidevice(msg.getDepartId(), msg.getDepartCapacitance(), msg.getDepartTemperature(), msg.getDepartTime());
                 multidevices.add(multidevice);
@@ -609,6 +596,13 @@ public class MainActivity extends AppCompatActivity {
             capacitance = msg.getDepartCapacitance();
             time = msg.getDepartTime();
             temperature = msg.getDepartTemperature();
+            for (int i = 0; i < MAIN.size(); i++) {
+                if (MAIN.get(i).id.equals(id)) {
+                    MAIN.remove(i);
+                }
+            }
+//            MainBean device = new MainBean(id, time, capacitance, temperature);
+//            MAIN.add(device);
             List<MainBean> list = new ArrayList<>();
             MainBean device = new MainBean();
             device.setId(id);//设备id
@@ -617,11 +611,13 @@ public class MainActivity extends AppCompatActivity {
             device.setTemperature(temperature);
             list.add(device);
             adapter.addData(list);
+
+//            historicalPicturesRv.setAdapter(new NewItem(MainActivity.this, MAIN));
             MyErrorLog.e("重复加载数据", id + ":" + capacitance + ":" + temperature + ":" + time);
         } catch (Exception exception) {
             MyErrorLog.e("消息回调错误", exception);
         } finally {
-//            rwl.writeLock().unlock();
+            rwl.writeLock().unlock();
         }
     }
 
@@ -649,10 +645,10 @@ public class MainActivity extends AppCompatActivity {
                         // TODO Auto-generated method stub
                         //要做的事情
                         readDataFromSerial();
-                        handler.postDelayed(this, 2000);
+                        handler.postDelayed(this, 1000);
                     }
                 };
-                handler.postDelayed(runnable, 2000);//每两秒执行一次runnable.
+                handler.postDelayed(runnable, 1000);//每两秒执行一次runnable.
                 break;
 
             case R.id.main_capacitance:
@@ -1578,13 +1574,6 @@ public class MainActivity extends AppCompatActivity {
                             String line = null;
                             StringBuilder builder = new StringBuilder();
                             while ((line = reader.readLine()) != null) {
-//                                builder.append(line);
-//                        if (line.contains(MainBean.Instance.id)) {
-//                            String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
-//                            String Cutins = Cut_IndexOF.replace(":", "");
-//                            DeviceName.Instance.setDeviceName(Cutins);
-//                            return Cutins;
-//                        }
                                 if (line.contains(id)) {
                                     String Cut_IndexOF = line.substring(line.indexOf(":"), line.length());
                                     String Cutins = Cut_IndexOF.replace(":", "");

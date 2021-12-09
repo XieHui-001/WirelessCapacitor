@@ -7,9 +7,17 @@ public class MainBean implements Serializable {
     public String tiem;//时间
     public String capacitance;//电容
     public String temperature;//温度
-    public static  MainBean Instance = null;
+    public static MainBean Instance = null;
 
-    public  MainBean(){
+
+    public MainBean(String id, String time, String capacitance, String temperature) {
+        this.id = id;
+        this.tiem = time;
+        this.capacitance = capacitance;
+        this.temperature = temperature;
+    }
+
+    public MainBean() {
         MainBean.Instance = this;
     }
 

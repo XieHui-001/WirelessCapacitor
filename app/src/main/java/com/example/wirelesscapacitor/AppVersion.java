@@ -21,13 +21,13 @@ public class AppVersion {
             if (versioncode <=0) {
                 return 0;
             }
-            MyLog.e("Version", "VersionName:" + versionName + "    VersionCode:" + versioncode);
+//            MyLog.e("Version", "VersionName:" + versionName + "    VersionCode:" + versioncode);
         } catch (Exception e) {
-            MyLog.e("VersionInfo", "Exception" + e);
+//            MyLog.e("VersionInfo", "Exception" + e);
         }
         if (versionName != null || versionName != "") {
         } else {
-            MyLog.e("Version is Null", "Get TalkDoo Version Error");
+//            MyLog.e("Version is Null", "Get TalkDoo Version Error");
         }
         return versioncode;
     }

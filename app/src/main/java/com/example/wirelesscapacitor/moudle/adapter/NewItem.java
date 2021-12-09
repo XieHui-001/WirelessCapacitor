@@ -1,111 +1,107 @@
 package com.example.wirelesscapacitor.moudle.adapter;
 
-import android.os.Environment;
+import android.content.Context;
+import android.os.Build;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
-import com.example.wirelesscapacitor.DeviceName;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.wirelesscapacitor.DeviceName_Install;
 import com.example.wirelesscapacitor.Device_Info;
+import com.example.wirelesscapacitor.Historical_Data_Value;
 import com.example.wirelesscapacitor.MainActivity;
 import com.example.wirelesscapacitor.MainBean;
 import com.example.wirelesscapacitor.MyErrorLog;
-import com.example.wirelesscapacitor.MyLog;
 import com.example.wirelesscapacitor.R;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
+public class NewItem extends RecyclerView.Adapter<NewItem.LinerViewHolder> {
+    private Context context;
+    private List<MainBean> Historical_Item_List;
+    private List<DeviceName_Install> deviceName_installs = new ArrayList<>();
+    DeviceName_Install deviceName_install = null;
+    private List<String> temporary_Str = new ArrayList<>();
 
-public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
-    public MainAdapter(@Nullable List<MainBean> data) {
-        super(R.layout.item_main, data);
+    public NewItem(Context context, List<MainBean> item_List) {
+        this.context = context;
+        this.Historical_Item_List = item_List;
     }
 
-    private String myData = "null";
-    private List<String> IsNULL = new ArrayList<>();
-    private List<DeviceName_Install> deviceName_installs = new ArrayList<>();
-    private List<String> temporary_Str = new ArrayList<>();
-    DeviceName_Install deviceName_install = null;
-    private boolean ist = false;
-
-    // notifyItemRangeChanged(i, mModels.size());
-    // Changed  item  Remove item Show
+    @NonNull
     @Override
-    protected void convert(BaseViewHolder helper, MainBean item) {
+    public NewItem.LinerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new NewItem.LinerViewHolder(LayoutInflater.from(context).inflate(R.layout.item_main, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull NewItem.LinerViewHolder holder, int position) {
         try {
             boolean isture = false;
             DeviceName_Install deviceName_install = null;
-            if (Device_Info.Instance.nOTnuLL == null || !Device_Info.Instance.nOTnuLL.equals(item.id)) {
-                final String ISnull = MainActivity.Instance.TimerTask_GetNewDeviceName(item.id);
+            if (Device_Info.Instance.nOTnuLL == null || !Device_Info.Instance.nOTnuLL.equals(Historical_Item_List.get(position).id)) {
+                final String ISnull = MainActivity.Instance.TimerTask_GetNewDeviceName(Historical_Item_List.get(position).id);
                 if (ISnull != null) {
                     if (temporary_Str.size() < 1) {
                         if (!temporary_Str.contains(ISnull)) {
                             temporary_Str.add(ISnull);
-                            deviceName_install = new DeviceName_Install(item.id, ISnull);
+                            deviceName_install = new DeviceName_Install(Historical_Item_List.get(position).id, ISnull);
                             deviceName_installs.add(deviceName_install);
                         }
                     } else {
                         boolean ss = false;
                         for (int i = 0; i < temporary_Str.size(); i++) {
-                            if (temporary_Str.get(i).equals(item.id)) {
+                            if (temporary_Str.get(i).equals(Historical_Item_List.get(position).id)) {
                                 ss = true;
                                 break;
                             }
                         }
                         if (ss) {
-                            temporary_Str.add(item.id);
-                            deviceName_install = new DeviceName_Install(item.id, ISnull);
+                            temporary_Str.add(Historical_Item_List.get(position).id);
+                            deviceName_install = new DeviceName_Install(Historical_Item_List.get(position).id, ISnull);
                             deviceName_installs.add(deviceName_install);
                         }
                     }
                     boolean isopen = false;
                     for (int i = 0; i < deviceName_installs.size(); i++) {
-                        if (item.id.equals(deviceName_installs.get(i).ID)) {
-                            helper.setText(R.id.test1, deviceName_installs.get(i).Name);
+                        if (Historical_Item_List.get(position).id.equals(deviceName_installs.get(i).ID)) {
+                            holder.test1.setText(deviceName_installs.get(i).Name);
                             isopen = true;
                             break;
                         }
                     }
                     if (!isopen) {
-                        helper.setText(R.id.test1, item.id);
+                        holder.test1.setText(Historical_Item_List.get(position).id);
                     }
                 } else {
                     if (deviceName_installs.size() > 0) {
                         for (int i = 0; i < deviceName_installs.size(); i++) {
-                            if (item.id.equals(deviceName_installs.get(i).ID)) {
+                            if (Historical_Item_List.get(position).id.equals(deviceName_installs.get(i).ID)) {
                                 isture = true;
-                                helper.setText(R.id.test1, deviceName_installs.get(i).Name);
+                                holder.test1.setText(deviceName_installs.get(i).Name);
                                 break;
                             }
                         }
                     }
                     if (!isture) {
-                        helper.setText(R.id.test1, item.id);
+                        holder.test1.setText(Historical_Item_List.get(position).id);
                     }
                 }
             } else {
                 MyErrorLog.e("3333", "");
-                helper.setText(R.id.test1, item.id); //Device_Info.Instance.nOTnuLL
+                holder.test1.setText(Historical_Item_List.get(position).id);
             }
-            if (myData != item.getCapacitance()) {
-                myData = item.getCapacitance();
+            if (true) {
                 Pattern pattern = Pattern.compile("\t|\r|\n|\\s*");
-                Matcher matcher = pattern.matcher(myData);
+                Matcher matcher = pattern.matcher(Historical_Item_List.get(position).capacitance);
                 String dest = matcher.replaceAll("");
                 String CutAuio = dest.replace("AUTO", "");
                 String Now_ = CutAuio.replace("+", "");
@@ -119,22 +115,22 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
                 String GetNOWVALUE = NoeStr + SUmStr;
                 if (GetNOWVALUE.contains("DC")) {
                     GetNOWVALUE.replace("DC", "");
-                    helper.setText(R.id.dataType, "DC");
+                    holder.dataType.setText("DC");
                     if (GetNOWVALUE.contains("ERR")) {
                         GetNOWVALUE.replace("ERR", "");
-                        helper.setText(R.id.dataUint, GetNOWVALUE);
+                        holder.dataUint.setText(GetNOWVALUE);
                     }
                 } else if (GetNOWVALUE.contains("AC")) {
                     GetNOWVALUE.replace("AC", "");
-                    helper.setText(R.id.dataType, "AC");
+                    holder.dataType.setText("AC");
                     if (GetNOWVALUE.contains("ERR")) {
                         GetNOWVALUE.replace("ERR", "");
-                        helper.setText(R.id.dataUint, "Ω");
+                        holder.dataUint.setText("Ω");
                     }
                 } else if (GetNOWVALUE.contains("Hz")) {
-                    helper.setText(R.id.dataType, "频率");
+                    holder.dataType.setText("频率");
                 } else if (GetNOWVALUE.contains("ERR") || GetNOWVALUE.contains("-ERR") || GetNOWVALUE.contains("?") || GetNOWVALUE.contains(".") || GetNOWVALUE.contains(":")) {
-                    helper.setText(R.id.dataValue, "ERR");
+                    holder.dataValue.setText("ERR");
                     GetNOWVALUE.replace("ERR", "");
                     GetNOWVALUE.replace("-ERR", "");
                     GetNOWVALUE.replace("?", "");
@@ -142,56 +138,52 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
                     GetNOWVALUE.replace(":", "");
                 }
 
-
                 if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("V")) {
-                    helper.setText(R.id.dataUint, "mV");
+                    holder.dataUint.setText("mV");
                 } else if (GetNOWVALUE.contains("M") && GetNOWVALUE.contains("Ω")) {
-                    helper.setText(R.id.dataType, "电阻");
-                    helper.setText(R.id.dataUint, "MΩ");
+                    holder.dataType.setText("电阻");
+                    holder.dataUint.setText("MΩ");
                 } else if (GetNOWVALUE.contains("Hz")) {
-                    helper.setText(R.id.dataUint, "Hz");
+                    holder.dataUint.setText("Hz");
                 } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("A")) {
-                    helper.setText(R.id.dataUint, "uA");
+                    holder.dataUint.setText("uA");
                 } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("A")) {
-                    helper.setText(R.id.dataUint, "mA");
+                    holder.dataUint.setText("mA");
                 } else if (GetNOWVALUE.contains("A") && GetNOWVALUE.contains("V")) {
-                    helper.setText(R.id.dataUint, "V");
+                    holder.dataUint.setText("V");
                 } else if (GetNOWVALUE.contains("A")) {
-                    helper.setText(R.id.dataUint, "A");
+                    holder.dataUint.setText("A");
                 } else if (GetNOWVALUE.contains("n") && GetNOWVALUE.contains("f")) {
-                    helper.setText(R.id.dataType, "电容");
-                    helper.setText(R.id.dataUint, "nF");
+                    holder.dataType.setText("电容");
+                    holder.dataUint.setText("nF");
                 } else if (GetNOWVALUE.contains("m") && GetNOWVALUE.contains("f")) {
-                    helper.setText(R.id.dataType, "电容");
-                    helper.setText(R.id.dataUint, "mF");
+                    holder.dataType.setText("电容");
+                    holder.dataUint.setText("nF");
                 } else if (GetNOWVALUE.contains("u") && GetNOWVALUE.contains("f")) {
-                    helper.setText(R.id.dataType, "电容");
-                    helper.setText(R.id.dataUint, "uF");
+                    holder.dataType.setText("电容");
+                    holder.dataUint.setText("uF");
                 } else if (GetNOWVALUE.contains("f")) {
-                    helper.setText(R.id.dataType, "电容");
-                    helper.setText(R.id.dataUint, "F");
+                    holder.dataType.setText("电容");
+                    holder.dataUint.setText("F");
                 } else if (GetNOWVALUE.contains("k") && GetNOWVALUE.contains("Ω")) {
-                    helper.setText(R.id.dataType, "电阻");
-                    helper.setText(R.id.dataUint, "kΩ");
+                    holder.dataType.setText("电阻");
+                    holder.dataUint.setText("kΩ");
                 } else if (GetNOWVALUE.contains("Diode") && GetNOWVALUE.contains("V")) {
-                    helper.setText(R.id.dataType, "二极管");
-                    helper.setText(R.id.dataUint, "V");
+                    holder.dataType.setText("二极管");
+                    holder.dataUint.setText("V");
                 } else if (GetNOWVALUE.contains("Ω")) {
-                    helper.setText(R.id.dataType, "电阻");
-                    helper.setText(R.id.dataUint, "Ω");
+                    holder.dataType.setText("电阻");
+                    holder.dataUint.setText("Ω");
 
-                } else if (GetNOWVALUE.contains("V") || GetNOWVALUE.contains("v")) {
-                    helper.setText(R.id.dataUint, "V");
                 }
 
-                MyErrorLog.e("截取的值",GetNOWVALUE);
                 if (GetNOWVALUE.contains("ERRDC") || GetNOWVALUE.contains("ERRVC")) {
-                    helper.setText(R.id.dataValue, "ERR");
+                    holder.dataValue.setText("ERR");
                 }
 
                 if (GetNOWVALUE.contains("-ERR")) {
                     GetNOWVALUE.replace("-ERR", "");
-                    helper.setText(R.id.dataValue, GetNOWVALUE);
+                    holder.dataValue.setText("GetNOWVALUE");
                 }
                 if (GetNOWVALUE.length() > 5) {
                     String Cut_Str = GetNOWVALUE.replace(" ", "");
@@ -203,24 +195,50 @@ public class MainAdapter extends BaseQuickAdapter<MainBean, BaseViewHolder> {
                     }
 
                     if (CutString.contains("ERRDC") || CutString.contains("ERRVC")) {
-                        helper.setText(R.id.dataValue, "ERR");
+                        holder.dataValue.setText("ERR");
                     } else if (CutString.contains("?")) {
-                        helper.setText(R.id.dataValue, "ERR");
+                        holder.dataValue.setText("ERR");
                     } else {
                         if (CutString.contains("ERRDC") || CutString.contains("ERRAC")) {
-                            helper.setText(R.id.dataValue, "ERR");
+                            holder.dataValue.setText("ERR");
                         } else if (CutString.contains("?")) {
-                            helper.setText(R.id.dataValue, "ERR");
+                            holder.dataValue.setText("ERR");
                         } else {
-                            helper.setText(R.id.dataValue, CutString);
+                            holder.dataValue.setText(CutString);
                         }
                     }
                 }
-                helper.setText(R.id.test3, item.getTemperature()); //温度
-                helper.setText(R.id.test4, item.getTiem()); //时间
+                holder.test3.setText(Historical_Item_List.get(position).temperature);
+                holder.test4.setText(Historical_Item_List.get(position).tiem);
             }
         } catch (Exception exception) {
             MyErrorLog.e("适配器错误 Item Error ", "info :" + exception.toString());
+        }
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public int getItemCount() {
+        return Historical_Item_List.size();
+    }
+
+    class LinerViewHolder extends RecyclerView.ViewHolder {
+        private TextView test1;
+        private TextView dataType;
+        private TextView dataValue;
+        private TextView dataUint;
+        private TextView test3;
+        private TextView test4;
+
+        public LinerViewHolder(@NonNull View itemView) {
+            super(itemView);
+            test1 = itemView.findViewById(R.id.test1);
+            dataType = itemView.findViewById(R.id.dataType);
+            dataValue = itemView.findViewById(R.id.dataValue);
+            dataUint = itemView.findViewById(R.id.dataUint);
+            test3 = itemView.findViewById(R.id.test3);
+            test4 = itemView.findViewById(R.id.test4);
         }
     }
 }
